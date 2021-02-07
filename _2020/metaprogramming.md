@@ -1,6 +1,6 @@
 ---
 layout: lecture
-title: "Metaprogramming"
+title: "Метапрограммирование"
 details: build systems, dependency management, testing, CI
 date: 2020-01-27
 ready: true
@@ -9,53 +9,31 @@ video:
   id: _Ms1Z4xfqv4
 ---
 
-What do we mean by "metaprogramming"? Well, it was the best collective
-term we could come up with for the set of things that are more about
-_process_ than they are about writing code or working more efficiently.
-In this lecture, we will look at systems for building and testing your
-code, and for managing dependencies. These may seem like they are of
-limited importance in your day-to-day as a student, but the moment you
-interact with a larger code base through an internship or once you enter
-the "real world", you will see this everywhere. We should note that
-"metaprogramming" can also mean "[programs that operate on
-programs](https://en.wikipedia.org/wiki/Metaprogramming)", whereas that
-is not quite the definition we are using for the purposes of this
-lecture.
+Что авторы курса подразумевают под "метапрограммированием"? 
+Оказалось, что это лучший из предложенных терминов для описания _процесса разработки в общем_, чем написания кода и эффективной работы.
+В этой лекции мы рассмотрим инструменты для создания и тестирования кода и управления зависимостями. 
+Может показаться, что эти вещи играют совсем не ключевую роль в повседневной жизни студента. Но в стажировке и будущей работе
+полученные знания пригодятся. 
+Обращаем внимание, что у метапрограммирования есть и другое общепринятое значение "[вид программирования, связанный с созданием программ, которые порождают другие программы как результат своей работы](https://en.wikipedia.org/wiki/Metaprogramming)", 
+которое отличается от того, что мы имеем в виду в лекции. 
 
-# Build systems
+# Системы сборки
 
-If you write a paper in LaTeX, what are the commands you need to run to
-produce your paper? What about the ones used to run your benchmarks,
-plot them, and then insert that plot into your paper? Or to compile the
-code provided in the class you're taking and then running the tests?
+Для большинства проектов, содержат они код или нет (например, LaTeX), существует _процесс сборки_. Это некоторый пошаговый набор 
+действий обязательный для получения финального результата. Этот процесс часто состоит из множества этапов. Для получения окончательного 
+результата нужно сначала запустить одно, потом сделать другое, переделать черновик, улучшить/изменить. Весь процесс довольно долгий и 
+раздражающий, но, как и для многих вещей в этом курсе, уже созданы инструменты, облегчающие работу. 
 
-For most projects, whether they contain code or not, there is a "build
-process". Some sequence of operations you need to do to go from your
-inputs to your outputs. Often, that process might have many steps, and
-many branches. Run this to generate this plot, that to generate those
-results, and something else to produce the final paper. As with so many
-of the things we have seen in this class, you are not the first to
-encounter this annoyance, and luckily there exist many tools to help
-you!
+Они многочисленны и обычно называются _системами сборки_. 
+Какую выбрать, зависит от поставленной задачи, языка программирования, размера проекта. Хотя в принципе все системы похожи между собой.
+Вы определяете набор _зависимостей_ (_dependencies_), количество _этапов_/_таргетов_ (_targets_, это названия/имена того, что надо 
+собирать) и _правил_ (_rules_).
+Вы сообщаете системе сборки конкретный таргет, а ее задача - найти все транзитивные (непрямые) зависимости, а затем применить правила 
+для создания промежуточных таргетов, пока не будет исполнен окончательный таргет. В идеале системы сборки делают это без лишнего 
+применения правил для таргегов, зависимости которых не изменились и чей результат доступен из предыдущего билда.
 
-These are usually called "build systems", and there are _many_ of them.
-Which one you use depends on the task at hand, your language of
-preference, and the size of the project. At their core, they are all
-very similar though. You define a number of _dependencies_, a number of
-_targets_, and _rules_ for going from one to the other. You tell the
-build system that you want a particular target, and its job is to find
-all the transitive dependencies of that target, and then apply the rules
-to produce intermediate targets all the way until the final target has
-been produced. Ideally, the build system does this without unnecessarily
-executing rules for targets whose dependencies haven't changed and where
-the result is available from a previous build.
-
-`make` is one of the most common build systems out there, and you will
-usually find it installed on pretty much any UNIX-based computer. It has
-its warts, but works quite well for simple-to-moderate projects. When
-you run `make`, it consults a file called `Makefile` in the current
-directory. All the targets, their dependencies, and the rules are
-defined in that file. Let's take a look at one:
+`make` одна из самых распространенных систем сборки, установленная на большинстве UNIX машин. У нее есть свои недостатки, но она хорошо 
+работает для простых, средних и сложных проектов. Когда вы запускаете `make`, она обращается к файлу `Makefile` в текущей директории. Все таргеты, их зависимости и правила определены в этом файле:
 
 ```make
 paper.pdf: paper.tex plot-data.png
@@ -65,29 +43,22 @@ plot-%.png: %.dat plot.py
 	./plot.py -i $*.dat -o $@
 ```
 
-Each directive in this file is a rule for how to produce the left-hand
-side using the right-hand side. Or, phrased differently, the things
-named on the right-hand side are dependencies, and the left-hand side is
-the target. The indented block is a sequence of programs to produce the
-target from those dependencies. In `make`, the first directive also
-defines the default goal. If you run `make` with no arguments, this is
-the target it will build. Alternatively, you can run something like
-`make plot-data.png`, and it will build that target instead.
+Каждая директива в этом файле - это правило по созданию левой части с помощью правой. Иначе говоря, то, что справа - это зависимости, а 
+слева - таргеты. Блок с отступом - это серия программ, которые производят таргеты из этих зависимостей. 
+В `make` первая директива определяет цель по умолчанию. Если `make` запустить без аргументов, то будут собираться все файлы сразу. 
+Поэтому, если нужно собрать конкретный подпроект, требуется уточнение, например, `make plot-data.png`.
 
-The `%` in a rule is a "pattern", and will match the same string on the
-left and on the right. For example, if the target `plot-foo.png` is
-requested, `make` will look for the dependencies `foo.dat` and
-`plot.py`. Now let's look at what happens if we run `make` with an empty
-source directory.
+Символ `%` содержится в паттернах, он показывает любую подстроку для сбора таргета. Например, если таргет `plot-foo.png`, то `make` 
+будет искать зависимости `foo.dat` и `plot.py`. 
+Посмотрим, что будет, если запустить `make` с пустой исходной директорией:
 
 ```console
 $ make
 make: *** No rule to make target 'paper.tex', needed by 'paper.pdf'.  Stop.
 ```
 
-`make` is helpfully telling us that in order to build `paper.pdf`, it
-needs `paper.tex`, and it has no rule telling it how to make that file.
-Let's try making it!
+`make` говорит нам о том, что для сборки `paper.pdf` нужен `paper.tex`. Но как создать этот требуемый файл, не указано. 
+Давайте попробуем его создать:
 
 ```console
 $ touch paper.tex
@@ -95,10 +66,8 @@ $ make
 make: *** No rule to make target 'plot-data.png', needed by 'paper.pdf'.  Stop.
 ```
 
-Hmm, interesting, there _is_ a rule to make `plot-data.png`, but it is a
-pattern rule. Since the source files do not exist (`foo.dat`), `make`
-simply states that it cannot make that file. Let's try creating all the
-files:
+Так, интересно. _Есть_ правило для создания `plot-data.png`, но это правило паттерна. До тех пор, пока файла (`foo.dat`) не существует, 
+`make` не может его создать. Тогда все файлы создадим мы:
 
 ```console
 $ cat paper.tex
@@ -130,7 +99,7 @@ $ cat data.dat
 5 8
 ```
 
-Now what happens if we run `make`?
+Теперь что будет, если мы запустим `make`?
 
 ```console
 $ make
@@ -139,18 +108,16 @@ pdflatex paper.tex
 ... lots of output ...
 ```
 
-And look, it made a PDF for us!
-What if we run `make` again?
+PDF создан!
+А если еще раз запустить `make`?
 
 ```console
 $ make
 make: 'paper.pdf' is up to date.
 ```
 
-It didn't do anything! Why not? Well, because it didn't need to. It
-checked that all of the previously-built targets were still up to date
-with respect to their listed dependencies. We can test this by modifying
-`paper.tex` and then re-running `make`:
+Ничего не произошло! Но системе сборки ничего и не нужно было делать. Она просто проверила все ранее созданные билды и зависимости. 
+Ошибок не обнаружено. Мы можем немного изменить `paper.tex` и перезапустить `make`:
 
 ```console
 $ vim paper.tex
@@ -159,131 +126,77 @@ pdflatex paper.tex
 ...
 ```
 
-Notice that `make` did _not_ re-run `plot.py` because that was not
-necessary; none of `plot-data.png`'s dependencies changed!
+Заметьте, что `make` не перезапустил `plot.py`, потому что это не нужно, так как ни одна из зависимостей `plot-data.png`не изменилась.
 
-# Dependency management
+# Система зависимостей
 
-At a more macro level, your software projects are likely to have
-dependencies that are themselves projects. You might depend on installed
-programs (like `python`), system packages (like `openssl`), or libraries
-within your programming language (like `matplotlib`). These days, most
-dependencies will be available through a _repository_ that hosts a
-large number of such dependencies in a single place, and provides a
-convenient mechanism for installing them. Some examples include the
-Ubuntu package repositories for Ubuntu system packages, which you access
-through the `apt` tool, RubyGems for Ruby libraries, PyPi for Python
-libraries, or the Arch User Repository for Arch Linux user-contributed
-packages.
+На более высоком макро уровне, выши проекты скорее всего будут иметь зависимости, которые сами по себе будет проектами. Это может 
+зависеть от установленных программ (например, `python`), системных пакетов (`openssl`) или библиотек языка программирования 
+(`matplotlib`). Сегодня большинство зависимостей доступны через _репозиторий_, который содержит большое количество таких зависимостей в 
+одном месте и предоставляет удобный механизм для их установки. Это, например, RubyGems для библиотек Ruby, PyPi для библиотек Python 
+или репозиторий Arch для Arch Linux.
 
-Since the exact mechanisms for interacting with these repositories vary
-a lot from repository to repository and from tool to tool, we won't go
-too much into the details of any specific one in this lecture. What we
-_will_ cover is some of the common terminology they all use. The first
-among these is _versioning_. Most projects that other projects depend on
-issue a _version number_ with every release. Usually something like
-8.1.3 or 64.1.20192004. They are often, but not always, numerical.
-Version numbers serve many purposes, and one of the most important of
-them is to ensure that software keeps working. Imagine, for example,
-that I release a new version of my library where I have renamed a
-particular function. If someone tried to build some software that
-depends on my library after I release that update, the build might fail
-because it calls a function that no longer exists! Versioning attempts
-to solve this problem by letting a project say that it depends on a
-particular version, or range of versions, of some other project. That
-way, even if the underlying library changes, dependent software
-continues building by using an older version of my library.
+Поскольку точный механизм взаимодействия с разными репозиториями сильно различается, мы не будем сейчас вдаваться в детали какого-либо 
+конкретного репозитория. Рассмотрим некоторые из наиболее распространенных терминов, которые все они используют. Первый из них - это 
+_версии_. Большинство проектов содержит _номер версии_, обновляемый с каждым новым релизом. Обычно он выглядит как-то так: 8.1.3 или 
+64.1.20192004. Обычно, но не всегда, версиям присваиваются номера.  
+Номера нужны по разным причинам, основная - обеспечение работы программ. Представьте, например, что выпущена новая версия библиотеки, в 
+которой переименована одна функция. Если кто-то попытается собрать программу, которая зависит от этой библиотеки, после того, как было 
+выпущено обновление, сборка может завершиться ошибкой, потому что вызываемая функция больше не существует! 
+Версии пытаются решить эту проблему, потому что указывают, что проект зависит от конкретной версии. Таким образом, даже если библиотека 
+изменится, программное обеспечение, зависящее от нее, продолжит сборку с использованием старой версии библиотеки. 
 
-That also isn't ideal though! What if I issue a security update which
-does _not_ change the public interface of my library (its "API"), and
-which any project that depended on the old version should immediately
-start using? This is where the different groups of numbers in a version
-come in. The exact meaning of each one varies between projects, but one
-relatively common standard is [_semantic
-versioning_](https://semver.org/). With semantic versioning, every
-version number is of the form: major.minor.patch. The rules are:
+Это тоже не идеальное решение! Что делать, если сделать обновление безопасности, которое не меняет публичный интерфейс этой описанной 
+выше библиотеки (ее API). И новую версию с обновленными параметрами безопасности теперь необходимо использовать во всех программах, 
+которые зависели от старой версии. Здесь нужно смотреть на разные группы чисел в версиях. Точное значение каждого из них зависит
+ от проекта, но один относительно общий стандарт - это семантическое версионирование [_semantic
+versioning_](https://semver.org/). С таким подходом, номер каждой версии выглядит как: мажорная.минорная.патч версия 
+(major.minor.patch). 
+Учитывая номер версии МАЖОРНАЯ.МИНОРНАЯ.ПАТЧ, следует увеличивать:
 
- - If a new release does not change the API, increase the patch version.
- - If you _add_ to your API in a backwards-compatible way, increase the
-   minor version.
- - If you change the API in a non-backwards-compatible way, increase the
-   major version.
+- МАЖОРНУЮ версию, когда сделаны обратно несовместимые изменения API.
+- МИНОРНУЮ версию, когда вы добавляете новую функциональность, не нарушая обратной совместимости.
+- ПАТЧ-версию, когда вы делаете обратно совместимые исправления.
+Дополнительные обозначения для предрелизных и билд-метаданных возможны как дополнения к МАЖОРНАЯ.МИНОРНАЯ.ПАТЧ формату.
 
-This already provides some major advantages. Now, if my project depends
-on your project, it _should_ be safe to use the latest release with the
-same major version as the one I built against when I developed it, as
-long as its minor version is at least what it was back then. In other
-words, if I depend on your library at version `1.3.7`, then it _should_
-be fine to build it with `1.3.8`, `1.6.1`, or even `1.3.0`. Version
-`2.2.4` would probably not be okay, because the major version was
-increased. We can see an example of semantic versioning in Python's
-version numbers. Many of you are probably aware that Python 2 and Python
-3 code do not mix very well, which is why that was a _major_ version
-bump. Similarly, code written for Python 3.5 might run fine on Python
-3.7, but possibly not on 3.4.
+Такая нумерация дает преимущества. Если мой проект использовал при сборке чужую библиотеку с версией `1.3.7`, я все еще могу 
+использовать версии с `1.3.8`, `1.6.1` или даже `1.3.0`. Версия `2.2.4`, вероятно, уже не подходит, поскольку мажорная версия 
+увеличилась. Пример семантического версионирования - версии Python. Многие из вас могли заметить, что версии Python 2 and Python 3
+не согласуются между собой, как раз потому что изменилась мажорная версия. А код, написанные на Python 3.5 нормально запускается и на 
+Python 3.7.
 
-When working with dependency management systems, you may also come
-across the notion of _lock files_. A lock file is simply a file that
-lists the exact version you are _currently_ depending on of each
-dependency. Usually, you need to explicitly run an update program to
-upgrade to newer versions of your dependencies. There are many reasons
-for this, such as avoiding unnecessary recompiles, having reproducible
-builds, or not automatically updating to the latest version (which may
-be broken). An extreme version of this kind of dependency locking is
-_vendoring_, which is where you copy all the code of your dependencies
-into your own project. That gives you total control over any changes to
-it, and lets you introduce your own changes to it, but also means you
-have to explicitly pull in any updates from the upstream maintainers
-over time.
+Работая с системами версий, вы могли заметить _lock файлы_. Это файлы, кторые содержат в себе полную информацию обо всех установленных 
+зависимостях, включая их точные версии. Обычно необходимо вручную запустить обновление программы, чтобы обновить зависимости до более 
+новых версий. На это есть много причин, таких как избежание перекомпиляции, 
+[детерминированной (воспроизводимой) компиляции](https://en.wikipedia.org/wiki/Reproducible_builds) или невозможность автоматического
+обновления до последней версии (которая может быть повреждена). 
 
-# Continuous integration systems
+# Continuous integration systems (CI) или тестирующие системы
 
-As you work on larger and larger projects, you'll find that there are
-often additional tasks you have to do whenever you make a change to it.
-You might have to upload a new version of the documentation, upload a
-compiled version somewhere, release the code to pypi, run your test
-suite, and all sort of other things. Maybe every time someone sends you
-a pull request on GitHub, you want their code to be style checked and
-you want some benchmarks to run? When these kinds of needs arise, it's
-time to take a look at continuous integration.
+С ростом проекта будет возникать больше дополнительных задач, которые нужно выполнять всякий раз при внесении изменений.
+Возможно, потребуется обновить новую версию документации, загрузить куда-нибудь скомпилированную версию, опубликовать код в pypi, 
+выполнить тестирование и многое другое. Может быть, каждый раз, когда кто-то отправляет пуллреквест в GitHub, вы хотите проверить его 
+код? На помощь к автоматизации таких процессов приходят тестирующие системы (CI).
 
-Continuous integration, or CI, is an umbrella term for "stuff that runs
-whenever your code changes", and there are many companies out there that
-provide various types of CI, often for free for open-source projects.
-Some of the big ones are Travis CI, Azure Pipelines, and GitHub Actions.
-They all work in roughly the same way: you add a file to your repository
-that describes what should happen when various things happen to that
-repository. By far the most common one is a rule like "when someone
-pushes code, run the test suite". When the event triggers, the CI
-provider spins up a virtual machines (or more), runs the commands in
-your "recipe", and then usually notes down the results somewhere. You
-might set it up so that you are notified if the test suite stops
-passing, or so that a little badge appears on your repository as long as
-the tests pass.
+CI (continuous integration) системы обозначают "запускаем что-то при любом изменении кода". Есть много разных, обычно опен-сорсных,
+и бесплатных CI. Наиболее крупные и известные: Travis CI, Azure Pipelines и GitHub Actions.
+Все они работают по похожему сценарию: при любом изменении кода запускаются тесты. 
 
-As an example of a CI system, the class website is set up using GitHub
-Pages. Pages is a CI action that runs the Jekyll blog software on every
-push to `master` and makes the built site available on a particular
-GitHub domain. This makes it trivial for us to update the website! We
-just make our changes locally, commit them with git, and then push. CI
-takes care of the rest.
+## Коротко о тестировании
 
-## A brief aside on testing
+Большинство крупных программных проектов поставляются с «набором тестов». Вы уже знакомы с общей концепцией тестирования, но ниже
+перечислены некоторые подходы к тестированию и терминология, которые вы можете встретить в работе:
 
-Most large software projects come with a "test suite". You may already
-be familiar with the general concept of testing, but we thought we'd
-quickly mention some approaches to testing and testing terminology that
-you may encounter in the wild:
-
- - Test suite: a collective term for all the tests
- - Unit test: a "micro-test" that tests a specific feature in isolation
- - Integration test: a "macro-test" that runs a larger part of the
-   system to check that different feature or components work _together_.
- - Regression test: a test that implements a particular pattern that
-   _previously_ caused a bug to ensure that the bug does not resurface.
- - Mocking: to replace a function, module, or type with a fake
-   implementation to avoid testing unrelated functionality. For example,
-   you might "mock the network" or "mock the disk".
+  - Тестовый набор (Test Suite): набор тест кейсов, которые объединены тем, что относятся к одному тестируемому модулю,
+  функциональности, приоритету или одному типу тестирования.
+  - Юнит тест, модельный тест (Unit Test): "микротест", который изолированно тестирует определенную функцию.
+  - Интеграционный тест: «макротест», который запускает большую часть программы, чтобы проверить, что различные функции или компоненты
+  работают _вместе_.
+  - Регрессионный тест: тест, реализующий определенный шаблон, который ранее вызывал ошибку, чтобы гарантировать, что ошибка не
+  появится снова.
+  - Мокинг (Mocking): проверяет, что какой-то код выполнился определённым образом. Это может быть вызов функции, HTTP-запрос и т.д.
+  Задача мока убедиться в том, что это произошло, и в том, как конкретно это произошло, например, что в функцию были переданы 
+  конкретные данные.
 
 # Exercises
 
