@@ -266,36 +266,35 @@ $ echo 1 | sudo tee /sys/class/leds/input6::scrolllock/brightness
 
 # Упражнения
 
- 1. Create a new directory called `missing` under `/tmp`.
- 1. Look up the `touch` program. The `man` program is your friend.
- 1. Use `touch` to create a new file called `semester` in `missing`.
- 1. Write the following into that file, one line at a time:
+ 1. Создайте новую директорию с именем `missing` в `/tmp`.
+ 1. Ознакомтесь с программой `touch`. Программа `man` - ваш друг в изучении новых команд.
+ 1. Используйте `touch` для создания нового файла с именем `semester` в директории `missing`.
+ 1. Запишите в созданный ранее файл, построчно, следующее:
     ```
     #!/bin/sh
     curl --head --silent https://missing.csail.mit.edu
     ```
-    The first line might be tricky to get working. It's helpful to know that
-    `#` starts a comment in Bash, and `!` has a special meaning even within
-    double-quoted (`"`) strings. Bash treats single-quoted strings (`'`)
-    differently: they will do the trick in this case. See the Bash
+    Первая строка имеет особенности при выполнении скрипта. Будет полезным знать, что
+    символ `#` означает начало комментария в Bash, а символ `!` имеет особое значение
+    даже внутри строки в двойных ковычках (`"`). Bash обрабатывает строки 
+    в одинарных ковычках (`'`) иначе. Обратитесь к 
     [quoting](https://www.gnu.org/software/bash/manual/html_node/Quoting.html)
-    manual page for more information.
- 1. Try to execute the file, i.e. type the path to the script (`./semester`)
-    into your shell and press enter. Understand why it doesn't work by
-    consulting the output of `ls` (hint: look at the permission bits of the
-    file).
- 1. Run the command by explicitly starting the `sh` interpreter, and giving it
-    the file `semester` as the first argument, i.e. `sh semester`. Why does
-    this work, while `./semester` didn't?
- 1. Look up the `chmod` program (e.g. use `man chmod`).
- 1. Use `chmod` to make it possible to run the command `./semester` rather than
-    having to type `sh semester`. How does your shell know that the file is
-    supposed to be interpreted using `sh`? See this page on the
-    [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix)) line for more
-    information.
- 1. Use `|` and `>` to write the "last modified" date output by
-    `semester` into a file called `last-modified.txt` in your home
-    directory.
- 1. Write a command that reads out your laptop battery's power level or your
-    desktop machine's CPU temperature from `/sys`. Note: if you're a macOS
-    user, your OS doesn't have sysfs, so you can skip this exercise.
+    справочной информацию для ознакомления с особенностями.
+ 1. Попробуйте запустить скрипт, введя путь к файлу (`./semester`)
+    в вашей оболочке и нажмите Enter. Разберитесь, почему скрипт не запускается
+    с помощью информации из вывода команды `ls`
+    (подсказка: обратите внимание на биты доступа к файлу).
+ 1. Запустите скрипт, явно указав интерпретатор `sh` в начале, и укажите путь к
+    `semester` первым аргументом, образец: `sh semester`.
+    Почему скрипт в этом случае сработал, когда при запуске `./semester` - нет?
+ 1. Ознакомьтесь с программой `chmod` (подсказка: введите `man chmod`).
+ 1. Используя `chmod`, сделайте возможным запуск скрипта при вводе `./semester`,
+    без необходимости ввода `sh semester`.
+    Как ваша оболочка узнала, что файл может быть интерпретирован `sh`?
+    Обратитесь к [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix))
+    за дополнительной информацией.
+ 1. Используя `|` и `>`, запишите дату "last modified" из вывода скрипта
+    `semester` в файл с именем `last-modified.txt` в вашей домашней директории.
+ 1. Напишите скрипт, который считывает уровень заряда батареи вашего ноутбука или
+    температуру процессора ПК из `/sys`. Пометка: если вы пользователь macOS,
+    вы можете пропустить данное упражнение, т.к. ваша операционная система не имеет sysfs.
