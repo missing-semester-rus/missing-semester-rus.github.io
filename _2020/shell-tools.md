@@ -69,7 +69,7 @@ false ; echo "This will always run"
 
 Другой распространенный шаблон – подстановка результата выполнения команды в виде переменной. Делается это через `$`. Если ввести в командную строку `$(cmd)`, то консоль подставит результат `cmd` как данные переменной. Например, `for file in $(ls)` — итерация по всем сущностям текущей папки.
 Похожая, но менее известная команда — _подстановка процесса_ (process substitution). Например, результат выполнения `diff <(ls foo) <(ls bar)` покажет разницу между файлами в директориях `foo` и `bar`.
-Давайте разберем на конкретном примере. Допустим, с помощью команды `grep` (это построковый поиск по регулярному выражению) попытаемся найти строку `foobar` в файле.
+Давайте разберем на конкретном примере. Допустим, с помощью команды `grep` (это построчный поиск по регулярному выражению) попытаемся найти строку `foobar` в файле.
 
 ```bash
 #!/bin/bash
@@ -93,7 +93,7 @@ done
 Bash проводит много сравнений подобного рода - вы можете найти подробный список на странице руководства [`test`](https://www.man7.org/linux/man-pages/man1/test.1.html).
 Выполняя сравнение в bash, попробуйте использовать двойные квадратные скобки `[[ ]]` вместо обычных `[ ]`. Это уменьшит вероятность ошибок. Подробное объяснение можно найти [здесь](http://mywiki.wooledge.org/BashFAQ/031).
 В скриптах часто встречается ситуация, когда нужно выполнить операцию над несколькими объектами файловой системы. В bash можно выполнить подстановку имен файлов - _«globbing»_ (по историческим причинам; в русском также известно как «универсализация файловых имен»).
-- Шаблоны (wildcards) -  для сопостовления и последующего удаления, поиска или архивирования большого количества файлов можно пользоваться `?` (для одного символа) и `*` (все символы). Например, даны файлы `foo`, `foo1`, `foo2`, `foo10` и `bar`, комманда `rm foo?` удалит `foo1` и `foo2`, тогда как команда `rm foo*` удалит все, кроме `bar`.
+- Шаблоны (wildcards) -  для сопоставления и последующего удаления, поиска или архивирования большого количества файлов можно пользоваться `?` (для одного символа) и `*` (все символы). Например, даны файлы `foo`, `foo1`, `foo2`, `foo10` и `bar`, комманда `rm foo?` удалит `foo1` и `foo2`, тогда как команда `rm foo*` удалит все, кроме `bar`.
 - Фигурные скобки `{}` - удобно использовать в случае, когда к файлу применяется серия команд. Например, при перемещении или конвертации. 
 
 ```bash
@@ -192,7 +192,7 @@ find . -name '*.png' -exec convert {} {}.jpg \;
 Обычный сценарий - поиск всех файлов, содержащих определенные строки/значения. Для таких случаев в UNIX-подобных системах есть [`grep`](https://www.man7.org/linux/man-pages/man1/grep.1.html). Более подробно `grep` мы рассмотрим в лекции по управлению данными.  
 
 У `grep` есть много флагов, что делает его по-настоящему универсальным.
-`-C` используется для получения числа строк контекста, `-v` для вывода строк, которые не сопадают с тем, что ищем. `-R` используется для быстрого поиска.
+`-C` используется для получения числа строк контекста, `-v` для вывода строк, которые не совпадают с тем, что ищем. `-R` используется для быстрого поиска.
 У `grep` есть альтернавы, такие как [ack](https://beyondgrep.com/), [ag](https://github.com/ggreer/the_silver_searcher) и [rg](https://github.com/BurntSushi/ripgrep). Они имеют схожий функционал.
 
 Рассмотрим другой аналог ripgrep (`rg`). Он быстрее ищет по коду, так как по умолчанию не проходит .git директории и бинарные файлы.
@@ -209,7 +209,7 @@ rg --stats PATTERN
 
 ## Поиск команд
 
-Выше мы рассматривали способы поиска файлов, директорий и кода. При долгой работе в оболочке обязательно возникнет необходимость в поиске ранее ипользованной команды. 
+Выше мы рассматривали способы поиска файлов, директорий и кода. При долгой работе в оболочке обязательно возникнет необходимость в поиске ранее использованной команды. 
 Во-первых, нажатие стрелки вверх вернет последнюю вызванную команду. Если продолжить нажимать ее, она медленно пройдет через историю работы.
 
 Команда `history` позволит получить доступ к истории. Все действия будут выведены на экран. Для последующего поиска по истории воспользуйтесь `grep`. Так, `history | grep find` выведет подстроки, содержащие "find".
@@ -220,7 +220,7 @@ rg --stats PATTERN
 Хороший поиск предлагает утилита [fzf](https://github.com/junegunn/fzf/wiki/Configuring-shell-key-bindings#ctrl-r) bindings.
 `fzf` предоставляет возможность нечеткого поиска с использованием множества команд. Результат поиска выводится в визуально приятном стиле.
 
-Еще один удобный прием - автодополнение (**history-based autosuggestions**). Впервые появился в оболочке [fish](https://fishshell.com/). При вводе команды плагин читает историю и дозаполняет последнюю команду из истории, начинающуюся с тех же символов. Функция доступна и в [zsh](https://github.com/zsh-users/zsh-autosuggestions) and it is a great quality of life trick for your shell.
+Еще один удобный прием - автодополнение (**history-based autosuggestions**). Впервые появился в оболочке [fish](https://fishshell.com/). При вводе команды плагин читает историю и дозаполняет последнюю команду из истории, начинающуюся с тех же символов. Функция доступна и в [zsh](https://github.com/zsh-users/zsh-autosuggestions) является значимым аргументом оболочки, улучшающим удобство использования.
 
 И последнее, о чем стоит помнить: если в начале команды стоит пробел, она не будет добавлена в историю. Это удобно при вводе пароля и другой конфиденциальной информации. 
 Если вы ошиблись и не добавили начальный пробел, вы всегда можете вручную удалить запись, отредактировав `.bash_history` или `.zhistory`.
@@ -238,14 +238,14 @@ rg --stats PATTERN
 
 # Упражнения
 
-1. Read [`man ls`](https://www.man7.org/linux/man-pages/man1/ls.1.html) and write an `ls` command that lists files in the following manner
+1. Прочтите [`man ls`](https://www.man7.org/linux/man-pages/man1/ls.1.html) и напишите команду `ls` которая выводит список файлов в следующем виде:
 
-    - Includes all files, including hidden files
-    - Sizes are listed in human readable format (e.g. 454M instead of 454279954)
-    - Files are ordered by recency
-    - Output is colorized
+    - Отображает все файлы, включая скрытые;
+    - Размер файлов представлен в удобном для человека формате (пример: 454M вместо 454279954);
+    - Порядок файлов - по дате изменения (от более новых - к старым);
+    - Вывод раскрашен.
 
-    A sample output would look like this
+    Образец вывода:
 
     ```
     -rw-r--r--   1 user group 1.1M Jan 14 09:53 baz
@@ -259,9 +259,9 @@ rg --stats PATTERN
 ls -lath --color=auto
 {% endcomment %}
 
-1. Write bash functions  `marco` and `polo` that do the following.
-Whenever you execute `marco` the current working directory should be saved in some manner, then when you execute `polo`, no matter what directory you are in, `polo` should `cd` you back to the directory where you executed `marco`.
-For ease of debugging you can write the code in a file `marco.sh` and (re)load the definitions to your shell by executing `source marco.sh`.
+1. Создайте команды bash `marco` и `polo` которые делают следующее.
+При выполнении команды `marco` - текущая рабочая директория должна быть сохранена таким образом, чтоб при выполнении команды `polo`, вне зависимости в какой директории вы находитесь сейчас, `polo` должно `cd` вернуть вас в ту директорию, где была выполнена команда `marco`.
+Для простоты дебагинга вы можете записать код команды в файл `marco.sh` и загрузить (перезагрузить) определения в вашей оболочке, выполнив `source marco.sh`.
 
 {% comment %}
 marco() {
@@ -273,9 +273,9 @@ polo() {
 }
 {% endcomment %}
 
-1. Say you have a command that fails rarely. In order to debug it you need to capture its output but it can be time consuming to get a failure run.
-Write a bash script that runs the following script until it fails and captures its standard output and error streams to files and prints everything at the end.
-Bonus points if you can also report how many runs it took for the script to fail.
+1. Скажем, вы имеете скрипт, который иногда выполняется с ошибкой. С целью дебагинга, вам необходимо записать выводимую информацию данного скрипта, но на это будет затрачено значительное количество времени, из-за продолжительности выполнения и редкости воспроизведения ошибки.
+Напишите скрипт bash, который выполняет указанный скрипт до тех пор, пока он не будет выполнен с ошибкой, записывает вывод скрипта и ошибок в файлы и выводит в консоль информацию об ошибке.
+Усложненное условие: выведите количество успешных запусков скрипта, произведенных до неудачной попытки.
 
     ```bash
     #!/usr/bin/env bash
@@ -305,16 +305,16 @@ echo "found error after $count runs"
 cat out.txt
 {% endcomment %}
 
-1. As we covered in the lecture `find`'s `-exec` can be very powerful for performing operations over the files we are searching for.
-However, what if we want to do something with **all** the files, like creating a zip file?
-As you have seen so far commands will take input from both arguments and STDIN.
-When piping commands, we are connecting STDOUT to STDIN, but some commands like `tar` take inputs from arguments.
-To bridge this disconnect there's the [`xargs`](https://www.man7.org/linux/man-pages/man1/xargs.1.html) command which will execute a command using STDIN as arguments.
-For example `ls | xargs rm` will delete the files in the current directory.
+1. Как было рассказано в лекции, команды `find` и `-exec` будут крайне полезны при выполнении операций над найденным файлом.
+Однако, что если мы хотим сделать что-то со **всеми** файлами, к примеру - заархивировать их?
+Как вам известно, команды могут принимать ввод из аргументов или из STDIN.
+При создании конвейеров, мы перенаправляем вывод одной команды в ввод другой (STDOUT -> STDIN), однако некоторые команды, такие как `tar`, принимают ввод из аргументов.
+Для возможности объединения данных подходов, используется команда [`xargs`](https://www.man7.org/linux/man-pages/man1/xargs.1.html), которая выполняет указанную команду используя STDIN как аргумент.
+К примеру `ls | xargs rm` удалит все файлы в директории.
 
-    Your task is to write a command that recursively finds all HTML files in the folder and makes a zip with them. Note that your command should work even if the files have spaces (hint: check `-d` flag for `xargs`)
+    Ваша задача - написать команду, которая рекурсивно находит все HTML файлы в директории и объединяет их в zip архив. Обратите внимание, что ваша команда должна работать даже если файлы содержат пробел в названии. (подсказка: ознакомьтесь с `-d` флагом команды `xargs`)
     {% comment %}
     find . -type f -name "*.html" | xargs -d '\n'  tar -cvzf archive.tar.gz
     {% endcomment %}
 
-1. (Advanced) Write a command or script to recursively find the most recently modified file in a directory. More generally, can you list all files by recency?
+1. (Продвинутое) Напишите команду или скрипт для рекурсивного поиска файла, который выводит самый последний измененный файл в директории, т.е. файл, который был изменен позже всех.
