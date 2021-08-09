@@ -238,14 +238,14 @@ rg --stats PATTERN
 
 # Упражнения
 
-1. Read [`man ls`](https://www.man7.org/linux/man-pages/man1/ls.1.html) and write an `ls` command that lists files in the following manner
+1. Прочтите [`man ls`](https://www.man7.org/linux/man-pages/man1/ls.1.html) и напишите команду `ls` которая выводит список файлов в следующем виде:
 
-    - Includes all files, including hidden files
-    - Sizes are listed in human readable format (e.g. 454M instead of 454279954)
-    - Files are ordered by recency
-    - Output is colorized
+    - Отображает все файлы, включая скрытые;
+    - Размер файлов представлен в удобном для человека формате (пример: 454M вместо 454279954);
+    - Порядок файлов - по дате изменения (от более новых - к старым);
+    - Вывод раскрашен.
 
-    A sample output would look like this
+    Образец вывода:
 
     ```
     -rw-r--r--   1 user group 1.1M Jan 14 09:53 baz
@@ -259,9 +259,9 @@ rg --stats PATTERN
 ls -lath --color=auto
 {% endcomment %}
 
-1. Write bash functions  `marco` and `polo` that do the following.
-Whenever you execute `marco` the current working directory should be saved in some manner, then when you execute `polo`, no matter what directory you are in, `polo` should `cd` you back to the directory where you executed `marco`.
-For ease of debugging you can write the code in a file `marco.sh` and (re)load the definitions to your shell by executing `source marco.sh`.
+1. Создайте команды bash `marco` и `polo` которые делают следующее.
+При выполнении команды `marco` - текущая рабочая директория должна быть сохранена таким образом, чтоб при выполнении команды `polo`, вне зависимости в какой директории вы находитесь сейчас, `polo` должно `cd` вернуть вас в ту директорию, где была выполнена команда `marco`.
+Для простоты дебагинга вы можете записать код команды в файл `marco.sh` и загрузить (перезагрузить) определения в вашей оболочке, выполнив `source marco.sh`.
 
 {% comment %}
 marco() {
@@ -273,9 +273,9 @@ polo() {
 }
 {% endcomment %}
 
-1. Say you have a command that fails rarely. In order to debug it you need to capture its output but it can be time consuming to get a failure run.
-Write a bash script that runs the following script until it fails and captures its standard output and error streams to files and prints everything at the end.
-Bonus points if you can also report how many runs it took for the script to fail.
+1. Скажем, вы имеете скрипт, который иногда выполняется с ошибкой. С целью дебагинга, вам необходимо записать выводимую информацию данного скрипта, но на это будет затрачено значительное количество времени, из-за продолжительности выполнения и редкости воспроизведения ошибки.
+Напишите скрипт bash, который выполняет указанный скрипт до тех пор, пока он не будет выполнен с ошибкой, записывает вывод скрипта и ошибок в файлы и выводит в консоль информацию об ошибке.
+Усложненное условие: выведите количество успешных запусков скрипта, произведенных до неудачной попытки.
 
     ```bash
     #!/usr/bin/env bash
@@ -305,16 +305,16 @@ echo "found error after $count runs"
 cat out.txt
 {% endcomment %}
 
-1. As we covered in the lecture `find`'s `-exec` can be very powerful for performing operations over the files we are searching for.
-However, what if we want to do something with **all** the files, like creating a zip file?
-As you have seen so far commands will take input from both arguments and STDIN.
-When piping commands, we are connecting STDOUT to STDIN, but some commands like `tar` take inputs from arguments.
-To bridge this disconnect there's the [`xargs`](https://www.man7.org/linux/man-pages/man1/xargs.1.html) command which will execute a command using STDIN as arguments.
-For example `ls | xargs rm` will delete the files in the current directory.
+1. Как было рассказано в лекции, команды `find` и `-exec` будут крайне полезны при выполнении операций над найденным файлом.
+Однако, что если мы хотим сделать что-то со **всеми** файлами, к примеру - заархивировать их?
+Как вам известно, команды могут принимать ввод из аргументов или из STDIN.
+При создании конвейеров, мы перенаправляем вывод одной команды в ввод другой (STDOUT -> STDIN), однако некоторые команды, такие как `tar`, принимают ввод из аргументов.
+Для возможности объединения данных подходов, используется команда [`xargs`](https://www.man7.org/linux/man-pages/man1/xargs.1.html), которая выполняет указанную команду используя STDIN как аргумент.
+К примеру `ls | xargs rm` удалит все файлы в директории.
 
-    Your task is to write a command that recursively finds all HTML files in the folder and makes a zip with them. Note that your command should work even if the files have spaces (hint: check `-d` flag for `xargs`)
+    Ваша задача - написать команду, которая рекурсивно находит все HTML файлы в директории и объединяет их в zip архив. Обратите внимание, что ваша команда должна работать даже если файлы содержат пробел в названии. (подсказка: ознакомьтесь с `-d` флагом команды `xargs`)
     {% comment %}
     find . -type f -name "*.html" | xargs -d '\n'  tar -cvzf archive.tar.gz
     {% endcomment %}
 
-1. (Advanced) Write a command or script to recursively find the most recently modified file in a directory. More generally, can you list all files by recency?
+1. (Продвинутое) Напишите команду или скрипт для рекурсивного поиска файла, который выводит самый последний измененный файл в директории, т.е. файл, который был изменен позже всех.
