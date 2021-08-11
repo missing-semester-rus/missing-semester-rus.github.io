@@ -30,71 +30,67 @@ Microsoft Word и Visual Studio Code).
 
 # Which editor to learn?
 
-Programmers have [strong opinions](https://en.wikipedia.org/wiki/Editor_war)
-about their text editors.
+Программисты [достаточно предубеждены](https://en.wikipedia.org/wiki/Editor_war)
+в отношении выбранного текстового редактора.
 
-Which editors are popular today? See this [Stack Overflow
+Какие из редакторов популярны сегодня? Если обратиться к результатам опроса [Stack Overflow
 survey](https://insights.stackoverflow.com/survey/2019/#development-environments-and-tools)
-(there may be some bias because Stack Overflow users may not be representative
-of programmers as a whole). [Visual Studio
-Code](https://code.visualstudio.com/) is the most popular editor.
-[Vim](https://www.vim.org/) is the most popular command-line-based editor.
+(результаты опроса не могут быть репрезентативны в полной мере, т.к. респонденты не могут представлять программистов в целом). [Visual Studio
+Code](https://code.visualstudio.com/) наиболее популярный текстовый редактор.
+[Vim](https://www.vim.org/) наиболее популярный консольный текстовый редактор.
 
 ## Vim
 
-All the instructors of this class use Vim as their editor. Vim has a rich
-history; it originated from the Vi editor (1976), and it's still being
-developed today. Vim has some really neat ideas behind it, and for this reason,
-lots of tools support a Vim emulation mode (for example, 1.4 million people
-have installed [Vim emulation for VS code](https://github.com/VSCodeVim/Vim)).
-Vim is probably worth learning even if you finally end up switching to some
-other text editor.
+Все лекторы данного курса используют Vim как редактор. Vim имеет богатую историю;
+он происходит от редактора Vi (1976), который поддерживается по сей день.
+Vim имеет несколько отличительных идей, и благодаря этому,
+большое количество других инструментов поддерживают Vim emulation mode (к примеру,
+1.4 миллиона пользователей установили плагин [Vim emulation for VS code](https://github.com/VSCodeVim/Vim)).
+Обучиться использовать Vim - стоящее дело, даже если 
+в итоге вы будете использовать другой текстовый редактор.  
 
-It's not possible to teach all of Vim's functionality in 50 minutes, so we're
-going to focus on explaining the philosophy of Vim, teaching you the basics,
-showing you some of the more advanced functionality, and giving you the
-resources to master the tool.
+Невозможно обучить вас всему функционалу Vim в течении 50 минут, поэтому мы сфокусируемся
+на объяснении "философии" Vim, расскажем основы, познакомим с некоторыми
+продвинутыми функциональностями и поделимся полезной информацией для совершенствования навыков работы.
 
-# Philosophy of Vim
+# Философия Vim
 
-When programming, you spend most of your time reading/editing, not writing. For
-this reason, Vim is a _modal_ editor: it has different modes for inserting text
-vs manipulating text. Vim is programmable (with Vimscript and also other
-languages like Python), and Vim's interface itself is a programming language:
-keystrokes (with mnemonic names) are commands, and these commands are
-composable. Vim avoids the use of the mouse, because it's too slow; Vim even
-avoids using the arrow keys because it requires too much movement.
+В процессе программирования, основная часть времени тратится на чтение и редактирование,
+а не на написание кода. В связи с этим, Vim является редактором с _переключаемыми режимами_ : для ввода текста или манипуляций с текстом требуется переключить режим. Vim - это програмируемый редактор
+(при использовании Vimscript и других языков, к примеру - Python),
+и в тоже время интерфейс Vim по своей сути - язык программирования:
+нажатие клавиш воспринимается как команды (по мнемоническим именам), и эти команды - комбинируемые.
+В Vim избегается возможность использования мыщи, так как это замедляет работу; в Vim даже избегается возможность использовать "стрелки" на клавиатуре для перемещения по тексту -
+так как на это требуется лишнее движение.
 
-The end result is an editor that can match the speed at which you think.
+В конечном результате скорость работы в данном редакторе может соответствовать скорости с которой вы думаете.
 
-# Modal editing
+# Режимы работы
 
-Vim's design is based on the idea that a lot of programmer time is spent
-reading, navigating, and making small edits, as opposed to writing long streams
-of text. For this reason, Vim has multiple operating modes.
+Принцип работы в Vim основан на идее, что в основная часть времени при программировании тратится на чтение, перемещение по коду и внесение небольших правок, а не написании больших объемов текста.
+В связи с этим, в Vim присутствуют несколько режимов работы.
 
-- **Normal**: for moving around a file and making edits
-- **Insert**: for inserting text
-- **Replace**: for replacing text
-- **Visual** (plain, line, or block): for selecting blocks of text
-- **Command-line**: for running a command
+- **Normal**: для перемещения по файлу и внесения правок
+- **Insert**: для ввода текста
+- **Replace**: для замены текста
+- **Visual** (простой, линейный или блочный): для выделения частей текста
+- **Command-line**: для выполнения команд
 
-Keystrokes have different meanings in different operating modes. For example,
-the letter `x` in Insert mode will just insert a literal character 'x', but in
-Normal mode, it will delete the character under the cursor, and in Visual mode,
-it will delete the selection.
+Нажатия клавиш воспринимаются по-разному в разных режимах. К примеру,
+при нажатии клавиши с символом `x` в режиме Insert приведет к вставке символа 'x', но в 
+Normal - символ, на котором находится курсор, будет удален, а в Visual,
+- будет удален весь выделенный текст.
 
-In its default configuration, Vim shows the current mode in the bottom left.
-The initial/default mode is Normal mode. You'll generally spend most of your
-time between Normal mode and Insert mode.
+В своей конфигурации по-умолчанию, режим работы Vim отображается внизу слева.
+Изначальный (стандартный) режим - Normal. Большую часть своего времени вы
+будете проводить в режимах Normal и Insert.
 
-You change modes by pressing `<ESC>` (the escape key) to switch from any mode
-back to Normal mode. From Normal mode, enter Insert mode with `i`, Replace mode
-with `R`, Visual mode with `v`, Visual Line mode with `V`, Visual Block mode
-with `<C-v>` (Ctrl-V, sometimes also written `^V`), and Command-line mode with
-`:`.
+Нажатие клавиши `<ESC>` используется для переключения в режим Normal из любого другого.
+Из режима Normal переход в режим Insert осуществляется при нажатии `i`, в Replace
+- `R`, в Visual (простой) - `v`, в Visual (линейный) - `V`, Visual (блочный)
+- `<C-v>` (Ctrl-V, иногда пишется как `^V`), и режим Command-line - `:`.
 
-You use the `<ESC>` key a lot when using Vim: consider remapping Caps Lock to
+Нажимать клавишу `<ESC>` придется достаточно часто в Vim: подумайте над перезначением клавиши Caps Lock в
 Escape ([macOS
 instructions](https://vim.fandom.com/wiki/Map_caps_lock_to_escape_in_macOS)).
 
