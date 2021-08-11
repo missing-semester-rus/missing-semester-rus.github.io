@@ -1,6 +1,6 @@
 ---
 layout: lecture
-title: "Editors (Vim)"
+title: "Текстовые редакторы (Vim)"
 date: 2020-01-15
 ready: true
 video:
@@ -8,31 +8,25 @@ video:
   id: a6Q8Na575qc
 ---
 
-Writing English words and writing code are very different activities. When
-programming, you spend more time switching files, reading, navigating, and
-editing code compared to writing a long stream. It makes sense that there are
-different types of programs for writing English words versus code (e.g.
-Microsoft Word versus Visual Studio Code).
+Написание слов и написание кода - очень разные активности. При программировании,
+вы затрачиваете значительно больше времени на переходы между файлами, чтение, перемещение и
+редактирование кода, в сравнении с написанием большого объема информации. Это объясняет тот факт, что существуют разные программы для написания текста и кода (к примеру:
+Microsoft Word и Visual Studio Code).
 
-As programmers, we spend most of our time editing code, so it's worth investing
-time mastering an editor that fits your needs. Here's how you learn a new
-editor:
+Как программисты, мы тратим основную часть времени на редактирование кода.
+Поэтому будет полезно потратить время на совершенствование навыков работы в том редакторе, который соответствует вашим требованиям.
 
-- Start with a tutorial (i.e. this lecture, plus resources that we point out)
-- Stick with using the editor for all your text editing needs (even if it slows
-you down initially)
-- Look things up as you go: if it seems like there should be a better way to do
-something, there probably is
+Вот основная концепция изучения и совершенствования работы в новом редакторе:
+- Ознакомьтесь с обучающими материалами (пример: эта лекция и указанные в ней дополнительные материалы);
+- Начните использовать выбранный редактор для всех случаев редактирования текстовой информации (даже если скорость работы в нем значительно ниже);
+- Обращайте внимание на детали при работе: если вам кажется, что есть способ сделать что-то эффективнее, скорее всего такой способ существует.
 
-If you follow the above method, fully committing to using the new program for
-all text editing purposes, the timeline for learning a sophisticated text
-editor looks like this. In an hour or two, you'll learn basic editor functions
-such as opening and editing files, save/quit, and navigating buffers. Once
-you're 20 hours in, you should be as fast as you were with your old editor.
-After that, the benefits start: you will have enough knowledge and muscle
-memory that using the new editor saves you time. Modern text editors are fancy
-and powerful tools, so the learning never stops: you'll get even faster as you
-learn more.
+Если вы будете придерживаться данной концепции, обязуясь использовать новый редактор при любой необходимости, ваш прогресс в изучении сложных текстовых редакторов будет подобен указанному далее.
+В течение часа или двух, вы ознакомитесь с базовым функционалом, таким как
+открытие, редактирование и сохранение файлов, выход из программы, и использование буфера.
+Как только вы перешагнете порог в 20 часов использования - вы будете таким же быстрым в использовании нового редактора, каким были при использовании старого.
+После этого ваша эффективность будет возрастать: вы будете иметь достаточно знаний и мышечной памяти и испольщование нового редактора будет экономить ваше время.
+Современные текстовые редакторы - сложные, но изысканные и производительные инструменты, поэтому обучение не должно прекращаться - вы будете использовать их более эффективно при дальнейшем изучении.
 
 # Which editor to learn?
 
