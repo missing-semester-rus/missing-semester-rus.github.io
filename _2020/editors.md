@@ -1,6 +1,6 @@
 ---
 layout: lecture
-title: "Editors (Vim)"
+title: "Текстовые редакторы (Vim)"
 date: 2020-01-15
 ready: true
 video:
@@ -8,99 +8,85 @@ video:
   id: a6Q8Na575qc
 ---
 
-Writing English words and writing code are very different activities. When
-programming, you spend more time switching files, reading, navigating, and
-editing code compared to writing a long stream. It makes sense that there are
-different types of programs for writing English words versus code (e.g.
-Microsoft Word versus Visual Studio Code).
+Написание слов и написание кода - очень разные активности. При программировании,
+вы затрачиваете значительно больше времени на переходы между файлами, чтение, перемещение и
+редактирование кода, в сравнении с написанием большого объема информации. Это объясняет тот факт, что существуют разные программы для написания текста и кода (к примеру:
+Microsoft Word и Visual Studio Code).
 
-As programmers, we spend most of our time editing code, so it's worth investing
-time mastering an editor that fits your needs. Here's how you learn a new
-editor:
+Как программисты, мы тратим основную часть времени на редактирование кода.
+Поэтому будет полезно потратить время на совершенствование навыков работы в том редакторе, который соответствует вашим требованиям.
 
-- Start with a tutorial (i.e. this lecture, plus resources that we point out)
-- Stick with using the editor for all your text editing needs (even if it slows
-you down initially)
-- Look things up as you go: if it seems like there should be a better way to do
-something, there probably is
+Вот основная концепция изучения и совершенствования работы в новом редакторе:
+- Ознакомьтесь с обучающими материалами (пример: эта лекция и указанные в ней дополнительные материалы);
+- Начните использовать выбранный редактор для всех случаев редактирования текстовой информации (даже если скорость работы в нем значительно ниже);
+- Обращайте внимание на детали при работе: если вам кажется, что есть способ сделать что-то эффективнее, скорее всего такой способ существует.
 
-If you follow the above method, fully committing to using the new program for
-all text editing purposes, the timeline for learning a sophisticated text
-editor looks like this. In an hour or two, you'll learn basic editor functions
-such as opening and editing files, save/quit, and navigating buffers. Once
-you're 20 hours in, you should be as fast as you were with your old editor.
-After that, the benefits start: you will have enough knowledge and muscle
-memory that using the new editor saves you time. Modern text editors are fancy
-and powerful tools, so the learning never stops: you'll get even faster as you
-learn more.
+Если вы будете придерживаться данной концепции, обязуясь использовать новый редактор при любой необходимости, ваш прогресс в изучении сложных текстовых редакторов будет подобен указанному далее.
+В течение часа или двух, вы ознакомитесь с базовым функционалом, таким как
+открытие, редактирование и сохранение файлов, выход из программы, и использование буфера.
+Как только вы перешагнете порог в 20 часов использования - вы будете таким же быстрым в использовании нового редактора, каким были при использовании старого.
+После этого ваша эффективность будет возрастать: вы будете иметь достаточно знаний и мышечной памяти и использование нового редактора будет экономить ваше время.
+Современные текстовые редакторы - сложные, но изысканные и производительные инструменты, поэтому обучение не должно прекращаться - вы будете использовать их более эффективно при дальнейшем изучении.
 
-# Which editor to learn?
+# Какой редактор использовать?
 
-Programmers have [strong opinions](https://en.wikipedia.org/wiki/Editor_war)
-about their text editors.
+Программисты [достаточно предубеждены](https://en.wikipedia.org/wiki/Editor_war)
+в отношении выбранного текстового редактора.
 
-Which editors are popular today? See this [Stack Overflow
+Какие из редакторов популярны сегодня? Если обратиться к результатам опроса [Stack Overflow
 survey](https://insights.stackoverflow.com/survey/2019/#development-environments-and-tools)
-(there may be some bias because Stack Overflow users may not be representative
-of programmers as a whole). [Visual Studio
-Code](https://code.visualstudio.com/) is the most popular editor.
-[Vim](https://www.vim.org/) is the most popular command-line-based editor.
+(результаты опроса могут быть предвзяты, т.к. респонденты на одном сайте не представляют всех программистов). [Visual Studio
+Code](https://code.visualstudio.com/) наиболее популярный текстовый редактор.
+[Vim](https://www.vim.org/) наиболее популярный консольный текстовый редактор.
 
 ## Vim
 
-All the instructors of this class use Vim as their editor. Vim has a rich
-history; it originated from the Vi editor (1976), and it's still being
-developed today. Vim has some really neat ideas behind it, and for this reason,
-lots of tools support a Vim emulation mode (for example, 1.4 million people
-have installed [Vim emulation for VS code](https://github.com/VSCodeVim/Vim)).
-Vim is probably worth learning even if you finally end up switching to some
-other text editor.
+Все лекторы данного курса используют Vim как редактор. Vim имеет богатую историю;
+он происходит от редактора Vi (1976), который поддерживается по сей день.
+Vim имеет несколько отличительных идей, и благодаря этому,
+большое количество других инструментов поддерживают эмуляцию Vim (к примеру,
+1.4 миллиона пользователей установили плагин [Vim emulation for VS code](https://github.com/VSCodeVim/Vim)).
+Обучиться использовать Vim - стоящее дело, даже если 
+в итоге вы будете использовать другой текстовый редактор.  
 
-It's not possible to teach all of Vim's functionality in 50 minutes, so we're
-going to focus on explaining the philosophy of Vim, teaching you the basics,
-showing you some of the more advanced functionality, and giving you the
-resources to master the tool.
+Невозможно обучить вас всему функционалу Vim в течении 50 минут, поэтому мы сфокусируемся
+на объяснении "философии" Vim, расскажем основы, познакомим с некоторыми
+продвинутыми функциональностями и поделимся полезной информацией для совершенствования навыков работы.
 
-# Philosophy of Vim
+# Философия Vim
 
-When programming, you spend most of your time reading/editing, not writing. For
-this reason, Vim is a _modal_ editor: it has different modes for inserting text
-vs manipulating text. Vim is programmable (with Vimscript and also other
-languages like Python), and Vim's interface itself is a programming language:
-keystrokes (with mnemonic names) are commands, and these commands are
-composable. Vim avoids the use of the mouse, because it's too slow; Vim even
-avoids using the arrow keys because it requires too much movement.
+В процессе программирования, основная часть времени тратится на чтение и редактирование,
+а не на написание кода. В связи с этим, Vim является редактором с _переключаемыми режимами_ : для ввода текста или манипуляций с текстом требуется переключить режим. Vim - это программируемый редактор
+(при использовании Vimscript и других языков, к примеру - Python),
+и в тоже время интерфейс Vim по своей сути - язык программирования:
+нажатие клавиш воспринимается как команды (по мнемоническим именам), и эти команды - комбинируемые.
+В Vim избегается возможность использования мыши, так как это замедляет работу; в Vim даже избегается возможность использовать "стрелки" на клавиатуре для перемещения по тексту -
+так как на это требуется лишнее движение.
 
-The end result is an editor that can match the speed at which you think.
+В конечном результате скорость работы в данном редакторе может соответствовать скорости, с которой вы думаете.
 
-# Modal editing
+# Режимы работы
 
-Vim's design is based on the idea that a lot of programmer time is spent
-reading, navigating, and making small edits, as opposed to writing long streams
-of text. For this reason, Vim has multiple operating modes.
+Принцип работы в Vim основан на идее, что основная часть времени при программировании тратится на чтение, перемещение по коду и внесение небольших правок, а не на написание больших объемов текста.
+В связи с этим в Vim присутствуют несколько режимов работы.
 
-- **Normal**: for moving around a file and making edits
-- **Insert**: for inserting text
-- **Replace**: for replacing text
-- **Visual** (plain, line, or block): for selecting blocks of text
-- **Command-line**: for running a command
+- **Normal**: для перемещения по файлу и внесения правок
+- **Insert**: для ввода текста
+- **Replace**: для замены текста
+- **Visual** (простой, линейный или блочный): для выделения частей текста
+- **Command-line**: для выполнения команд
 
-Keystrokes have different meanings in different operating modes. For example,
-the letter `x` in Insert mode will just insert a literal character 'x', but in
-Normal mode, it will delete the character under the cursor, and in Visual mode,
-it will delete the selection.
+Нажатия клавиш воспринимаются по-разному в разных режимах. К примеру, нажатие клавиши `x` в режиме Insert приведет к вставке символа 'x', но в 
+Normal - символ, на котором находится курсор, будет удален, а в Visual - будет удален весь выделенный текст.
 
-In its default configuration, Vim shows the current mode in the bottom left.
-The initial/default mode is Normal mode. You'll generally spend most of your
-time between Normal mode and Insert mode.
+В своей конфигурации по-умолчанию режим работы Vim отображается внизу слева.
+Изначальный (стандартный) режим - Normal. Большую часть своего времени вы
+будете проводить в режимах Normal и Insert.
 
-You change modes by pressing `<ESC>` (the escape key) to switch from any mode
-back to Normal mode. From Normal mode, enter Insert mode with `i`, Replace mode
-with `R`, Visual mode with `v`, Visual Line mode with `V`, Visual Block mode
-with `<C-v>` (Ctrl-V, sometimes also written `^V`), and Command-line mode with
-`:`.
+Нажатие клавиши `<ESC>` используется для переключения в режим Normal из любого другого.
+Из режима Normal переход в режим Insert осуществляется при нажатии `i`, в Replace - `R`, в Visual (простой) - `v`, в Visual (линейный) - `V`, Visual (блочный) - `<C-v>` (Ctrl-V, иногда пишется как `^V`), и режим Command-line - `:`.
 
-You use the `<ESC>` key a lot when using Vim: consider remapping Caps Lock to
+Нажимать клавишу `<ESC>` придется достаточно часто в Vim: подумайте над перезначением клавиши Caps Lock в
 Escape ([macOS
 instructions](https://vim.fandom.com/wiki/Map_caps_lock_to_escape_in_macOS)).
 
