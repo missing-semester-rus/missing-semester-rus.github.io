@@ -90,123 +90,105 @@ Normal - символ, на котором находится курсор, бу
 Escape ([macOS
 instructions](https://vim.fandom.com/wiki/Map_caps_lock_to_escape_in_macOS)).
 
-# Basics
+# Основы
 
-## Inserting text
+## Вставка текста (Insert)
 
-From Normal mode, press `i` to enter Insert mode. Now, Vim behaves like any
-other text editor, until you press `<ESC>` to return to Normal mode. This,
-along with the basics explained above, are all you need to start editing files
-using Vim (though not particularly efficiently, if you're spending all your
-time editing from Insert mode).
+Для перехода в режим Insert из режима Normal, требуется нажать клавишу `i`. 
+Теперь поведение Vim будет схоже с любым другим текстовым редактором, пока клавиша `<ESC>` не будет нажата для возврата в Normal режим. Этого,
+с учетом основ, описанных ранее, достаточно для начала работы в Vim (хотя и не особо эффективно, если вы проводите все время при редактировании в режиме Insert).
 
-## Buffers, tabs, and windows
+## Буферы, вкладки и окна
 
-Vim maintains a set of open files, called "buffers". A Vim session has a number
-of tabs, each of which has a number of windows (split panes). Each window shows
-a single buffer. Unlike other programs you are familiar with, like web
-browsers, there is not a 1-to-1 correspondence between buffers and windows;
-windows are merely views. A given buffer may be open in _multiple_ windows,
-even within the same tab. This can be quite handy, for example, to view two
-different parts of a file at the same time.
+Vim поддерживает открытие нескольких файлов, называемых "буферами". Сессия Vim имеет перечень вкладок, каждая из которых содержит окна (разделенные панели). Каждое окно отображает один буфер. В отличии от других программ известных вам, к примеру - веб-браузер, в Vim нет строгого соответствия (1 к 1) между буферами и окнами: окна - это просто интерфейс отображения. Выбранный буфер может быть открыт одновременно в _нескольких_ окнах, и даже более того - в нескольких окнах одной вкладки. Это достаточно удобно, например, для одновременного просмотра двух разных частей файла.
 
-By default, Vim opens with a single tab, which contains a single window.
+По умолчанию Vim открывается с одной вкладкой, содержащей одно окно.
 
-## Command-line
+## Командная строка (Command-line)
 
-Command mode can be entered by typing `:` in Normal mode. Your cursor will jump
-to the command line at the bottom of the screen upon pressing `:`. This mode
-has many functionalities, including opening, saving, and closing files, and
-[quitting Vim](https://twitter.com/iamdevloper/status/435555976687923200).
+В режим Command-line можно перейти нажав `:` в режиме Normal. Ваш курсор переместится в строку команд внизу экрана после нажатия `:`. Этот режим имеет большое количество функций, включая открытие, сохранение, закрытие файлов и [выход из Vim](https://twitter.com/iamdevloper/status/435555976687923200).
 
-- `:q` quit (close window)
-- `:w` save ("write")
-- `:wq` save and quit
-- `:e {name of file}` open file for editing
-- `:ls` show open buffers
-- `:help {topic}` open help
-    - `:help :w` opens help for the `:w` command
-    - `:help w` opens help for the `w` movement
+- `:q` quit (Закрыть окно)
+- `:w` save (Сохранить изменения - от англ. "write")
+- `:wq` сохранить и выйти
+- `:e {name of file}` открыть файл для редактирования - от англ. "edit"
+- `:ls` показать открытые буферы - от англ. "list show" 
+- `:help {topic}` открыть окно помощи
+    - `:help :w` открыть подсказку  для команды `:w`
+    - `:help w` открыть подсказку при `w` навигации
 
-# Vim's interface is a programming language
+# Интерфейс Vim - язык программирования
 
-The most important idea in Vim is that Vim's interface itself is a programming
-language. Keystrokes (with mnemonic names) are commands, and these commands
-_compose_. This enables efficient movement and edits, especially once the
-commands become muscle memory.
+Наиболее важная идея в Vim заключается в том, что интерфейс Vim является языком программирования.
+Вводимые символьные комбинации (из мнемонических имен) - команды, и эти команды можно
+_объединять_. Это позволяет эффективно перемещаться и вносить изменения, в особенности тогда, когда команды отложены в мышечной памяти.
 
-## Movement
+## Перемещение
 
-You should spend most of your time in Normal mode, using movement commands to
-navigate the buffer. Movements in Vim are also called "nouns", because they
-refer to chunks of text.
+Вы должны проводить основную часть времени в Normal режиме, используя команды для перемещения по
+буферу. Перемещения в Vim также называют "существительные", потому что они относятся к фрагментам текста.
 
-- Basic movement: `hjkl` (left, down, up, right)
-- Words: `w` (next word), `b` (beginning of word), `e` (end of word)
-- Lines: `0` (beginning of line), `^` (first non-blank character), `$` (end of line)
-- Screen: `H` (top of screen), `M` (middle of screen), `L` (bottom of screen)
-- Scroll: `Ctrl-u` (up), `Ctrl-d` (down)
-- File: `gg` (beginning of file), `G` (end of file)
-- Line numbers: `:{number}<CR>` or `{number}G` (line {number})
-- Misc: `%` (corresponding item)
-- Find: `f{character}`, `t{character}`, `F{character}`, `T{character}`
-    - find/to forward/backward {character} on the current line
-    - `,` / `;` for navigating matches
-- Search: `/{regex}`, `n` / `N` for navigating matches
+- Базовое перемещение: `hjkl` (влево, вниз, вверх, вправо)
+- Слова: `w` (следующее слово), `b` (начало предыдущего слова), `e` (конец следующего слова )
+- Строки: `0` (начало строки), `^` (первый непробельный символ строки), `$` (окончание строки)
+- Экран: `H` (верх экрана), `M` (середина экрана), `L` (низ экрана)
+- Scroll: `Ctrl-u` (вверх), `Ctrl-d` (вниз)
+- Файл: `gg` (начало файла), `G` (конец файла)
+- Номер строки	: `:{number}<CR>` либо `{number}G` (номер строки - {number}, <CR> - нажатие клавиши Enter)
+- Дополнительно: `%` (связанный символ - пример: переход между скобками, кавычками и т.д.)
+- Поиск: `f{character}`, `t{character}`, `F{character}`, `T{character}`	
+	- f | F - поиск символа в строке (вперед | назад)
+	- t | T - переход к символу, за которым находится искомый {character} в текущей строке (вперед | назад)
+	- `,` / `;` для перехода между результатами поиска
+- Поиск по файлу: `/{regex}`, `n` / `N` для навигации по результатам.
 
-## Selection
+## Выбор
 
-Visual modes:
+Визуальный режим:
 
 - Visual
 - Visual Line
 - Visual Block
 
-Can use movement keys to make selection.
+После перехода в визуальный режим используйте клавиши навигации для выбора части текста.
 
-## Edits
+## Внесение изменений
 
-Everything that you used to do with the mouse, you now do with the keyboard
-using editing commands that compose with movement commands. Here's where Vim's
-interface starts to look like a programming language. Vim's editing commands
-are also called "verbs", because verbs act on nouns.
+Все, что вы раньше делали с помощью мыши, сейчас требуется делать на клавиатуре с помощью команд редактирования, которые следует объединить с командами перемещения.
+Вот где интерфейс Vim начинает выглядеть как язык программирования. Команды редактирования в Vim также называют глаголами "verbs", потому что глаголы действуют на существительные.
 
-- `i` enter Insert mode
-    - but for manipulating/deleting text, want to use something more than
-    backspace
-- `o` / `O` insert line below / above
-- `d{motion}` delete {motion}
-    - e.g. `dw` is delete word, `d$` is delete to end of line, `d0` is delete
-    to beginning of line
-- `c{motion}` change {motion}
-    - e.g. `cw` is change word
-    - like `d{motion}` followed by `i`
-- `x` delete character (equal do `dl`)
-- `s` substitute character (equal to `xi`)
-- Visual mode + manipulation
-    - select text, `d` to delete it or `c` to change it
-- `u` to undo, `<C-r>` to redo
-- `y` to copy / "yank" (some other commands like `d` also copy)
-- `p` to paste
-- Lots more to learn: e.g. `~` flips the case of a character
+- `i` переход в Insert режим
+    - но для изменения/удаления текст желательно использовать что-то более удобное чем "backspace"
+- `o` / `O` вставка строки ниже / Выше
+- `d{motion}` удалить {команда передвижения}
+    - примеры: `dw` - удалить слово, `d$` - удалить все до конца строки, `d0` - удалить все до начала строки, `d3d` - удалить 3 строки.
+- `c{motion}` изменить {команда передвижения}
+    - к примеру: `cw` - изменить слово (удалить и перейти в режим Insert)
+- `x` удалить символ (соответствует - `dl`)
+- `s` заменить символ (соответствует - `xi`)
+- Visual режим + манипуляции
+    - выделить текст, `d` - для удаления либо `c` для его изменения
+- `u` для отмены последнего действия, `<C-r>` - повторение отмененного действия
+- `y` копирование
+- `p` вставка
+- И еще большое количество для изучения, к примеру -  `~` изменяет регистр символа
 
-## Counts
+## Счетчик 
 
-You can combine nouns and verbs with a count, which will perform a given action
-a number of times.
+Вы можете сочетать существительные и глаголы (объекты и действия) с действием count, которое выполнит заданное действие определенное количество раз.
 
-- `3w` move 3 words forward
-- `5j` move 5 lines down
-- `7dw` delete 7 words
+- `3w` переместиться на 3 слова вперед
+- `5j` переместиться на 5 строк вниз
+- `7dw` удалить 7 слов
 
-## Modifiers
+## Модификаторы
 
-You can use modifiers to change the meaning of a noun. Some modifiers are `i`,
-which means "inner" or "inside", and `a`, which means "around".
+Вы можете использовать модификаторы для изменения значения существительных (объектов). Некоторые модификаторы - это `i`,
+что обозначает - внутренний, внутри ("inner", "inside"), и `a` - внешние ("around").
 
-- `ci(` change the contents inside the current pair of parentheses
-- `ci[` change the contents inside the current pair of square brackets
-- `da'` delete a single-quoted string, including the surrounding single quotes
+- `ci(` изменить содержимое внутри текущей пары скобок
+- `ci[` изменить содержимое внутри текущей пары квадратных скобок
+- `da'` удалить содержимое подстроки, отмеченной одинарными кавычками, включая одинарные кавычки.
 
 # Demo
 
