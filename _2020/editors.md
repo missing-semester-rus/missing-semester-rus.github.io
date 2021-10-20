@@ -86,7 +86,7 @@ Normal - символ, на котором находится курсор, бу
 Нажатие клавиши `<ESC>` используется для переключения в режим Normal из любого другого.
 Из режима Normal переход в режим Insert осуществляется при нажатии `i`, в Replace - `R`, в Visual (простой) - `v`, в Visual (линейный) - `V`, Visual (блочный) - `<C-v>` (Ctrl-V, иногда пишется как `^V`), и режим Command-line - `:`.
 
-Нажимать клавишу `<ESC>` придется достаточно часто в Vim: подумайте над перезначением клавиши Caps Lock в
+Нажимать клавишу `<ESC>` придется достаточно часто в Vim: подумайте над переназначением клавиши Caps Lock в
 Escape ([macOS
 instructions](https://vim.fandom.com/wiki/Map_caps_lock_to_escape_in_macOS)).
 
@@ -175,7 +175,7 @@ _объединять_. Это позволяет эффективно пере�
 
 ## Счетчик 
 
-Вы можете сочетать существительные и глаголы (объекты и действия) с действием count, которое выполнит заданное действие определенное количество раз.
+Вы можете объединять существительные и глаголы (объекты и действия) с количеством, в результате чего будет произведено выбранное действие указанное количество раз.
 
 - `3w` переместиться на 3 слова вперед
 - `5j` переместиться на 5 строк вниз
@@ -190,10 +190,9 @@ _объединять_. Это позволяет эффективно пере�
 - `ci[` изменить содержимое внутри текущей пары квадратных скобок
 - `da'` удалить содержимое подстроки, отмеченной одинарными кавычками, включая одинарные кавычки.
 
-# Demo
+# Демонстрация
 
-Here is a broken [fizz buzz](https://en.wikipedia.org/wiki/Fizz_buzz)
-implementation:
+Ниже представлен нерабочий код для [fizz buzz](https://en.wikipedia.org/wiki/Fizz_buzz):
 
 ```python
 def fizz_buzz(limit):
@@ -209,220 +208,195 @@ def main():
     fizz_buzz(10)
 ```
 
-We will fix the following issues:
+Нам требуется исправить следующие проблемы:
 
-- Main is never called
-- Starts at 0 instead of 1
-- Prints "fizz" and "buzz" on separate lines for multiples of 15
-- Prints "fizz" for multiples of 5
-- Uses a hard-coded argument of 10 instead of taking a command-line argument
+- Функция main никогда не вызывается;
+- Счет начинается с 0, а не 1;
+- Слова "fizz" и "buzz" выводятся на разных строках, если число делится на 15;
+- Выводится слово "fizz" для чисел, делимых на 5;
+- Используется предопределенный аргумент, равный 10, вместо использования аргумента командной строки.
 
 {% comment %}
-- main is never called
-  - `G` end of file
-  - `o` open new line below
-  - type in "if __name__ ..." thing
-- starts at 0 instead of 1
-  - search for `/range`
-  - `ww` to move forward 2 words
-  - `i` to insert text, "1, "
-  - `ea` to insert after limit, "+1"
-- newline for "fizzbuzz"
-  - `jj$i` to insert text at end of line
-  - add ", end=''"
-  - `jj.` to repeat for second print
-  - `jjo` to open line below if
-  - add "else: print()"
+- Функция main никогда не вызывается:
+  - `G` - для перехода к концу файла
+  - `o` - для вставки новой строки и перехода в режим Insert
+  - вводим "if __name__ ..." конструкцию
+- Счет начинается с 0, а не 1
+  - производим поиск `/range`
+  - `ww` - для перемещения курсора вперед на 2 слова
+  - `i` для перехода в режим вставки текста, "1, "
+  - `ea` для вставки символов после limit, "+1"
+- Новая линия для "fizzbuzz"
+  - `jj$i` вставить текст в конце строки
+  - вводим ", end=''"
+  - `jj.` для перехода на две строки ниже и повторения ввода
+  - `jjo` для перехода на две строки ниже и вставки строки под if
+  - вводим "else: print()"
 - fizz fizz
-  - `ci'` to change fizz
-- command-line argument
-  - `ggO` to open above
-  - "import sys"
+  - `ci'` для изменения слова fizz
+- Использование аргумента из командной строки
+  - `ggO` для перехода в начало файла и вставки новой строки
+  - вводим "import sys"
   - `/10`
   - `ci(` to "int(sys.argv[1])"
 {% endcomment %}
 
-See the lecture video for the demonstration. Compare how the above changes are
-made using Vim to how you might make the same edits using another program.
-Notice how very few keystrokes are required in Vim, allowing you to edit at the
-speed you think.
+Посмотрите видео лекцию для ознакомления. Сравните, как вышеуказанные изменения выполняются при использовании Vim с тем, как вы выполните такие же изменения в любом другом редакторе.
+Заметьте, что всего лишь несколько команд в Vim позволяют вам вносить изменения на скорости ваших мыслей.
 
-# Customizing Vim
+# Кастомизация Vim
 
-Vim is customized through a plain-text configuration file in `~/.vimrc`
-(containing Vimscript commands). There are probably lots of basic settings that
-you want to turn on.
+Vim может быть кастомизирован с помощью текстового конфигурационного файла `~/.vimrc`
+(содержит Vimscript команды). В нем имеется большое количество базовых настроек, которые вы, вероятно, захотите включить.
 
-We are providing a well-documented basic config that you can use as a starting
-point. We recommend using this because it fixes some of Vim's quirky default
-behavior. **Download our config [here](/2020/files/vimrc) and save it to
-`~/.vimrc`.**
+Мы предоставляем базовый конфигурационный файл, наполненный комментариями, который может быть использован вами как отправная точка. Мы рекомендуем использовать его, так как в нем исправлены некоторые причуды стандартной конфигурации Vim.
 
-Vim is heavily customizable, and it's worth spending time exploring
-customization options. You can look at people's dotfiles on GitHub for
-inspiration, for example, your instructors' Vim configs
-([Anish](https://github.com/anishathalye/dotfiles/blob/master/vimrc),
+**Ссылка на скачивание нашего конфигурационного файла [здесь](/2020/files/vimrc), его требуется сохранить как `~/.vimrc`.**
+
+Vim имеет большое количество настроек, и целесообразно потратить время на изучение
+вариантов настройки. Вы можете посмотреть на дот-файлы других преподавателей на GitHub для
+вдохновения, к примеру ([Anish](https://github.com/anishathalye/dotfiles/blob/master/vimrc),
 [Jon](https://github.com/jonhoo/configs/blob/master/editor/.config/nvim/init.vim) (uses [neovim](https://neovim.io/)),
-[Jose](https://github.com/JJGO/dotfiles/blob/master/vim/.vimrc)). There are
-lots of good blog posts on this topic too. Try not to copy-and-paste people's
-full configuration, but read it, understand it, and take what you need.
+[Jose](https://github.com/JJGO/dotfiles/blob/master/vim/.vimrc)). 
 
-# Extending Vim
+Существует большое количество хороших постов в блогах на данную тему. Старайтесь не копировать полностью конфигурации других людей, а читайте их, старайтесь разобраться и используйте лишь то, что вам действительно необходимо.
 
-There are tons of plugins for extending Vim. Contrary to outdated advice that
-you might find on the internet, you do _not_ need to use a plugin manager for
-Vim (since Vim 8.0). Instead, you can use the built-in package management
-system. Simply create the directory `~/.vim/pack/vendor/start/`, and put
-plugins in there (e.g. via `git clone`).
+# Расширения Vim
 
-Here are some of our favorite plugins:
+Существует огромное количество плагинов для расширения возможностей Vim. Вопреки устаревшим советам, на которые вы можете натолкнуться в интернете, вам _нет_ необходимости использовать менеджер плагинов для
+Vim (с выпуска Vim 8.0). Вместо этого, вы можете использовать встроенный пакетный менеджер. Просто создайте директорию `~/.vim/pack/vendor/start/`, и копируйте плагины туда (например с использованием `git clone`).
 
-- [ctrlp.vim](https://github.com/ctrlpvim/ctrlp.vim): fuzzy file finder
-- [ack.vim](https://github.com/mileszs/ack.vim): code search
-- [nerdtree](https://github.com/scrooloose/nerdtree): file explorer
-- [vim-easymotion](https://github.com/easymotion/vim-easymotion): magic motions
+Здесь перечислены некоторые из наших избранных плагинов:
 
-We're trying to avoid giving an overwhelmingly long list of plugins here. You
-can check out the instructors' dotfiles
-([Anish](https://github.com/anishathalye/dotfiles),
+- [ctrlp.vim](https://github.com/ctrlpvim/ctrlp.vim): поиск файлов по регулярным выражениям
+- [ack.vim](https://github.com/mileszs/ack.vim): поиск в коде
+- [nerdtree](https://github.com/scrooloose/nerdtree): файловый навигатор
+- [vim-easymotion](https://github.com/easymotion/vim-easymotion): магическая навигация
+
+Мы стараемся избежать перечисления избыточно длинного списка плагинов. Вы можете посмотреть дот-файлы других преподавателей ([Anish](https://github.com/anishathalye/dotfiles),
 [Jon](https://github.com/jonhoo/configs),
-[Jose](https://github.com/JJGO/dotfiles)) to see what other plugins we use.
-Check out [Vim Awesome](https://vimawesome.com/) for more awesome Vim plugins.
-There are also tons of blog posts on this topic: just search for "best Vim
-plugins".
+[Jose](https://github.com/JJGO/dotfiles)), чтобы узнать, какие еще плагины мы используем.
+Посмотрите [Vim Awesome](https://vimawesome.com/) для других великолепных плагинов Vim.
+Существует большое количество постов в разнообразных блогах на эту тему: просто поищите "лучшие плагины Vim".
 
-# Vim-mode in other programs
+# Режим совместимости Vim в других программах
 
-Many tools support Vim emulation. The quality varies from good to great;
-depending on the tool, it may not support the fancier Vim features, but most
-cover the basics pretty well.
+Множество инструментов поддерживают эмуляцию Vim. Качество эмуляции варьируется от хорошего до великолепного, в зависимости от инструмента; они могут не поддерживать продвинутые фичи Vim, но большинство покрывает базовый функционал действительно хорошо.
 
-## Shell
+## Командная оболочка 
 
-If you're a Bash user, use `set -o vi`. If you use Zsh, `bindkey -v`. For Fish,
-`fish_vi_key_bindings`. Additionally, no matter what shell you use, you can
-`export EDITOR=vim`. This is the environment variable used to decide which
-editor is launched when a program wants to start an editor. For example, `git`
-will use this editor for commit messages.
+Если вы используете Bash, введите `set -o vi`. При использовании Zsh, `bindkey -v`. Для Fish,
+`fish_vi_key_bindings`. Дополнительно, вне зависимости какую оболочку вы используете, вы можете ввести
+`export EDITOR=vim`. Эта переменная окружения используется при определении какой редактор требуется запустить, когда программа желает запустить редактор. К примеру, `git`
+будет использовать указанный редактор для сообщений при комите.
 
 ## Readline
 
-Many programs use the [GNU
-Readline](https://tiswww.case.edu/php/chet/readline/rltop.html) library for
-their command-line interface. Readline supports (basic) Vim emulation too,
-which can be enabled by adding the following line to the `~/.inputrc` file:
+Множество программ используют библиотеку [GNU
+Readline](https://tiswww.case.edu/php/chet/readline/rltop.html) для
+их интерфейса командной строки. Readline поддерживает эмуляцию (базовую) Vim также,
+которая может быть включена после добавления следующей строки в файл `~/.inputrc`:
 
 ```
 set editing-mode vi
 ```
 
-With this setting, for example, the Python REPL will support Vim bindings.
+При включении этой опции, к примеру, Python REPL будет поддерживать сочетания клавиш Vim.
 
-## Others
+## Другое
 
-There are even vim keybinding extensions for web
-[browsers](http://vim.wikia.com/wiki/Vim_key_bindings_for_web_browsers) - some
-popular ones are
+Существуют даже расширения, позволяющие использовать сочетаний клавиш vim в
+[веб-браузерах](http://vim.wikia.com/wiki/Vim_key_bindings_for_web_browsers) - некоторые популярные из них
 [Vimium](https://chrome.google.com/webstore/detail/vimium/dbepggeogbaibhgnhhndojpepiihcmeb?hl=en)
-for Google Chrome and [Tridactyl](https://github.com/tridactyl/tridactyl) for
-Firefox. You can even get Vim bindings in [Jupyter
+для Google Chrome и [Tridactyl](https://github.com/tridactyl/tridactyl) для
+Firefox. Вы даже можете включить использование сочетаний клавиш Vim в [Jupyter
 notebooks](https://github.com/lambdalisue/jupyter-vim-binding).
 
-# Advanced Vim
+# Продвинутый Vim
 
-Here are a few examples to show you the power of the editor. We can't teach you
-all of these kinds of things, but you'll learn them as you go. A good
-heuristic: whenever you're using your editor and you think "there must be a
-better way of doing this", there probably is: look it up online.
+Здесь приведены несколько примеров для демонстрации всей силы этого редактора. Мы не можем обучить вас
+всем таким приемам, но вы обязательно их выучите самостоятельно при использовании vim. 
+Существует эвристический метод: если при использовании своего редактора, вы задумываетесь, что должен быть лучший способ сделать что-либо -- он вероятно существует: попробуйте поискать в интернете.
 
-## Search and replace
+## Поиск и замена
 
-`:s` (substitute) command ([documentation](http://vim.wikia.com/wiki/Search_and_replace)).
+`:s` (комбинаторная) команда ([документация](http://vim.wikia.com/wiki/Search_and_replace)).
 
 - `%s/foo/bar/g`
-    - replace foo with bar globally in file
+    - заменить foo на bar во всем файле
 - `%s/\[.*\](\(.*\))/\1/g`
-    - replace named Markdown links with plain URLs
+    - заменить поименованные Markdown ссылки на URLs
 
-## Multiple windows
+## Многооконность
 
-- `:sp` / `:vsp` to split windows
-- Can have multiple views of the same buffer.
+- `:sp` / `:vsp` для разделения окон
+- Можно иметь несколько открытых "сессий" одного и того же буфера (файла).
 
-## Macros
+## Макросы
 
-- `q{character}` to start recording a macro in register `{character}`
-- `q` to stop recording
-- `@{character}` replays the macro
-- Macro execution stops on error
-- `{number}@{character}` executes a macro {number} times
-- Macros can be recursive
-    - first clear the macro with `q{character}q`
-    - record the macro, with `@{character}` to invoke the macro recursively
-    (will be a no-op until recording is complete)
-- Example: convert xml to json ([file](/2020/files/example-data.xml))
-    - Array of objects with keys "name" / "email"
-    - Use a Python program?
-    - Use sed / regexes
+- `q{character}` для начала записи макроса в реестр `{character}`
+- `q` для окончания записи
+- `@{character}` воспроизведение макроса
+- Выполнение макроса останавливается при ошибке
+- `{number}@{character}` выполняет макрос {number} раз
+- Макросы могут быть рекурсивны
+    - сперва очистите макрос `q{character}q`
+    - запишите макрос, используя `@{character}` для введения в рекурсию
+    (не будет работать до тех пор, пока запись не будет завершена)
+- Пример: конвертация xml в json ([файл](/2020/files/example-data.xml))
+    - Массив объектов с ключами "name" / "email"
+    - Будем использовать Python скрипт?
+    - Можно использовать sed / regexes
         - `g/people/d`
         - `%s/<person>/{/g`
         - `%s/<name>\(.*\)<\/name>/"name": "\1",/g`
         - ...
-    - Vim commands / macros
-        - `Gdd`, `ggdd` delete first and last lines
-        - Macro to format a single element (register `e`)
-            - Go to line with `<name>`
+    - Vim команды / макрос
+        - `Gdd`, `ggdd` для удаления первой и последней строк
+        - Макрос для форматирования  одного элемента (зарегистрирован как `e`)
+            - Перейти к строке, содержащей `<name>`
             - `qe^r"f>s": "<ESC>f<C"<ESC>q`
-        - Macro to format a person
-            - Go to line with `<person>`
+        - Макрос для форматирования объекта
+            - Перейти к строке, содержащей `<person>`
             - `qpS{<ESC>j@eA,<ESC>j@ejS},<ESC>q`
-        - Macro to format a person and go to the next person
-            - Go to line with `<person>`
+        - Макрос для форматирования  объекта и перехода к следующему
+            - Перейти к строке, содержащей `<person>`
             - `qq@pjq`
-        - Execute macro until end of file
+        - Запуск выполнения макроса до конца файла
             - `999@q`
-        - Manually remove last `,` and add `[` and `]` delimiters
+        - Вручную удалить последнюю `,` и добавить `[` и `]` разделители
 
-# Resources
+# Полезные ресурсы
 
-- `vimtutor` is a tutorial that comes installed with Vim - if Vim is installed, you should be able to run `vimtutor` from your shell
-- [Vim Adventures](https://vim-adventures.com/) is a game to learn Vim
+- `vimtutor` который поставляется совместно с Vim - если Vim установлен, вы способны запустить `vimtutor` из оболочки командной строки 
+- [Vim Adventures](https://vim-adventures.com/) игра для изучения Vim
 - [Vim Tips Wiki](http://vim.wikia.com/wiki/Vim_Tips_Wiki)
-- [Vim Advent Calendar](https://vimways.org/2019/) has various Vim tips
-- [Vim Golf](http://www.vimgolf.com/) is [code golf](https://en.wikipedia.org/wiki/Code_golf), but where the programming language is Vim's UI
+- [Vim Advent Calendar](https://vimways.org/2019/) - различные советы для Vim
+- [Vim Golf](http://www.vimgolf.com/) - [Код-гольфинг](https://en.wikipedia.org/wiki/Code_golf), но тут в роли языка программирования выступает командный интерфейс Vim
 - [Vi/Vim Stack Exchange](https://vi.stackexchange.com/)
 - [Vim Screencasts](http://vimcasts.org/)
-- [Practical Vim](https://pragprog.com/titles/dnvim2/) (book)
+- [Practical Vim](https://pragprog.com/titles/dnvim2/) (книга)
 
-# Exercises
+# Упражнения
 
-1. Complete `vimtutor`. Note: it looks best in a
-   [80x24](https://en.wikipedia.org/wiki/VT100) (80 columns by 24 lines)
-   terminal window.
-1. Download our [basic vimrc](/2020/files/vimrc) and save it to `~/.vimrc`. Read
-   through the well-commented file (using Vim!), and observe how Vim looks and
-   behaves slightly differently with the new config.
-1. Install and configure a plugin:
+1. Выполните `vimtutor`. Пометка: лучше всего выглядит в формате
+   [80x24](https://en.wikipedia.org/wiki/VT100) (80 столбцов на 24 строки)
+   окна терминала.
+1. Скачайте наш [базовый vimrc](/2020/files/vimrc) и сохраните его как `~/.vimrc`. 
+Прочтите этот отлично прокомментированный файл (используя Vim!), и познакомьтесь как Vim выглядит и ведет себя немного по-другому с новым файлом конфигурации.
+1. Установите и настройте плагин:
    [ctrlp.vim](https://github.com/ctrlpvim/ctrlp.vim).
-   1. Create the plugins directory with `mkdir -p ~/.vim/pack/vendor/start`
-   1. Download the plugin: `cd ~/.vim/pack/vendor/start; git clone
-      https://github.com/ctrlpvim/ctrlp.vim`
-   1. Read the
-      [documentation](https://github.com/ctrlpvim/ctrlp.vim/blob/master/readme.md)
-      for the plugin. Try using CtrlP to locate a file by navigating to a
-      project directory, opening Vim, and using the Vim command-line to start
-      `:CtrlP`.
-    1. Customize CtrlP by adding
-       [configuration](https://github.com/ctrlpvim/ctrlp.vim/blob/master/readme.md#basic-options)
-       to your `~/.vimrc` to open CtrlP by pressing Ctrl-P.
-1. To practice using Vim, re-do the [Demo](#demo) from lecture on your own
-   machine.
-1. Use Vim for _all_ your text editing for the next month. Whenever something
-   seems inefficient, or when you think "there must be a better way", try
-   Googling it, there probably is. If you get stuck, come to office hours or
-   send us an email.
-1. Configure your other tools to use Vim bindings (see instructions above).
-1. Further customize your `~/.vimrc` and install more plugins.
-1. (Advanced) Convert XML to JSON ([example file](/2020/files/example-data.xml))
-   using Vim macros. Try to do this on your own, but you can look at the
-   [macros](#macros) section above if you get stuck.
+   1. Создайте директорию для плагина `mkdir -p ~/.vim/pack/vendor/start`
+   1. Скачайте плагин: `cd ~/.vim/pack/vendor/start; git clone https://github.com/ctrlpvim/ctrlp.vim`
+   1. Прочтите [документацию](https://github.com/ctrlpvim/ctrlp.vim/blob/master/readme.md)
+      к плагину. Попробуйте использовать CtrlP для поиска файла и навигации директорию проекта, открытия Vim, и использования командной строки Vim для запуска `:CtrlP`.
+    1. Сконфигурируйте CtrlP добавлением новых параметров 
+       [конфигурация](https://github.com/ctrlpvim/ctrlp.vim/blob/master/readme.md#basic-options)
+       в ваш `~/.vimrc` для открытия CtrlP при нажатии Ctrl-P.
+1. Для практики в использовании Vim, повторите изменения из [Демонстрация](#Демонстрация) самостоятельно.
+1. Используйте Vim во _всех_ случаях редактирования текста в течение месяца. В случае, когда что-либо кажется неэффективным, или когда вы думаете "должен быть более хороший способ сделать это", пробуйте
+   загуглить, и, вероятнее всего, найдете. 
+1. Настройте другие ваши инструменты (программы) на использование сочетаний клавиш Vim (посмотрите на инструкции выше).
+1. Продолжайте кастомизировать ваш `~/.vimrc` и установите больше плагинов.
+1. (Усложненное) Конвертируйте XML в JSON ([пример файла](/2020/files/example-data.xml))
+   с использованием макросов Vim. Попробуйте самостоятельно, в крайнем случае - обратитесь к разделу  [Макросы](#Макросы).
