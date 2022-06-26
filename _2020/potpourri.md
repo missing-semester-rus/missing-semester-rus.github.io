@@ -8,7 +8,7 @@ video:
   id: JZDt-PRq0uo
 ---
 
-## Table of Contents
+## Содержание
 
 - [Keyboard remapping](#keyboard-remapping)
 - [Daemons](#daemons)
@@ -16,7 +16,7 @@ video:
 - [Backups](#backups)
 - [APIs](#apis)
 - [Common command-line flags/patterns](#common-command-line-flagspatterns)
-- [Window managers](#window-managers)
+- [Оконные менеджеры](#оконные-менеджеры)
 - [VPNs](#vpns)
 - [Markdown](#markdown)
 - [Hammerspoon (desktop automation on macOS)](#hammerspoon-desktop-automation-on-macos)
@@ -197,26 +197,23 @@ features though that can be good to be aware of:
    you pass things that look like flags without them being interpreted
    as such: `rm -- -r` or `ssh machine --for-ssh -- foo --for-foo`.
 
-## Window managers
+## Оконные менеджеры
 
-Most of you are used to using a "drag and drop" window manager, like
-what comes with Windows, macOS, and Ubuntu by default. There are windows
-that just sort of hang there on screen, and you can drag them around,
-resize them, and have them overlap one another. But these are only one
-_type_ of window manager, often referred to as a "floating" window
-manager. There are many others, especially on Linux. A particularly
-common alternative is a "tiling" window manager. In a tiling window
-manager, windows never overlap, and are instead arranged as tiles on
-your screen, sort of like panes in tmux. With a tiling window manager,
-the screen is always filled by whatever windows are open, arranged
-according to some _layout_. If you have just one window, it takes up the
-full screen. If you then open another, the original window shrinks to
-make room for it (often something like 2/3 and 1/3). If you open a
-third, the other windows will again shrink to accommodate the new
-window. Just like with tmux panes, you can navigate around these tiled
-windows with your keyboard, and you can resize them and move them
-around, all without touching the mouse. They are worth looking into!
-
+Большинство из вас привыкли использовать оконный менеджер, позволяющий
+перетаскивать окна программ, который по умолчанию поставляется с Windows, macOS
+и Ubuntu. Окна можно накладывать друг на друга, изменять их размер, перемещать в
+любую часть экрана. Но эти возможности характеризуют лишь один _тип_ оконного
+менеджера, который называется "плавающим" (floating). Существует множество
+других типов, в особенности для Linux. Распространенной альтернативой является
+"плиточный" (tiling) оконный менеджер. Плиточный тип не позволяет окнам
+перекрывать друг друга, таким образом окна располагаются на экране, как панели в
+tmux. С плиточным менеджером экран всегда заполнен открытыми окнами, располагая
+их в соответствии с заданным _макетом_. Если открыто только одно окно, оно будет
+занимать весь экран. Открытие второго окна заставляет первое подвинуться, и
+теперь окна занимают по половине (или 1/3 и 2/3) экрана. Открывая третье,
+существующие окна снова поджимаются, чтобы вместить нового соседа. Как и в
+случае с панелями tmux, по окнам можно перемещаться, изменять их размер
+переставлять, используя лишь клавиатуру. Их стоит попробовать!
 
 ## VPNs
 
