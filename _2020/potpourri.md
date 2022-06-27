@@ -8,7 +8,7 @@ video:
   id: JZDt-PRq0uo
 ---
 
-## Table of Contents
+## Содержание
 
 - [Keyboard remapping](#keyboard-remapping)
 - [Daemons](#daemons)
@@ -16,7 +16,7 @@ video:
 - [Backups](#backups)
 - [APIs](#apis)
 - [Common command-line flags/patterns](#common-command-line-flagspatterns)
-- [Window managers](#window-managers)
+- [Оконные менеджеры](#оконные-менеджеры)
 - [VPNs](#vpns)
 - [Markdown](#markdown)
 - [Hammerspoon (desktop automation on macOS)](#hammerspoon-desktop-automation-on-macos)
@@ -197,26 +197,23 @@ features though that can be good to be aware of:
    you pass things that look like flags without them being interpreted
    as such: `rm -- -r` or `ssh machine --for-ssh -- foo --for-foo`.
 
-## Window managers
+## Оконные менеджеры
 
-Most of you are used to using a "drag and drop" window manager, like
-what comes with Windows, macOS, and Ubuntu by default. There are windows
-that just sort of hang there on screen, and you can drag them around,
-resize them, and have them overlap one another. But these are only one
-_type_ of window manager, often referred to as a "floating" window
-manager. There are many others, especially on Linux. A particularly
-common alternative is a "tiling" window manager. In a tiling window
-manager, windows never overlap, and are instead arranged as tiles on
-your screen, sort of like panes in tmux. With a tiling window manager,
-the screen is always filled by whatever windows are open, arranged
-according to some _layout_. If you have just one window, it takes up the
-full screen. If you then open another, the original window shrinks to
-make room for it (often something like 2/3 and 1/3). If you open a
-third, the other windows will again shrink to accommodate the new
-window. Just like with tmux panes, you can navigate around these tiled
-windows with your keyboard, and you can resize them and move them
-around, all without touching the mouse. They are worth looking into!
-
+Большинство из вас привыкли использовать оконный менеджер, позволяющий
+перетаскивать окна программ, который по умолчанию поставляется с Windows, macOS
+и Ubuntu. Окна можно накладывать друг на друга, изменять их размер, перемещать в
+любую часть экрана. Но эти возможности характеризуют лишь один _тип_ оконного
+менеджера, который называется "плавающим" (floating). Существует множество
+других типов, в особенности для Linux. Распространенной альтернативой является
+"плиточный" (tiling) оконный менеджер. Плиточный тип не позволяет окнам
+перекрывать друг друга, таким образом окна располагаются на экране, как панели в
+tmux. С плиточным менеджером экран всегда заполнен открытыми окнами, располагая
+их в соответствии с заданным _макетом_. Если открыто только одно окно, оно будет
+занимать весь экран. Открытие второго окна заставляет первое подвинуться, и
+теперь окна занимают по половине (или 1/3 и 2/3) экрана. Открывая третье,
+существующие окна снова поджимаются, чтобы вместить нового соседа. Как и в
+случае с панелями tmux, по окнам можно перемещаться, изменять их размер
+переставлять, используя лишь клавиатуру. Их стоит попробовать!
 
 ## VPNs
 
@@ -258,37 +255,35 @@ your own, give [WireGuard](https://www.wireguard.com/) a look.
 
 ## Markdown
 
-There is a high chance that you will write some text over the course of
-your career. And often, you will want to mark up that text in simple
-ways. You want some text to be bold or italic, or you want to add
-headers, links, and code fragments. Instead of pulling out a heavy tool
-like Word or LaTeX, you may want to consider using the lightweight
-markup language [Markdown](https://commonmark.org/help/).
-
-You have probably seen Markdown already, or at least some variant of it.
-Subsets of it are used and supported almost everywhere, even if it's not
-under the name Markdown. At its core, Markdown is an attempt to codify
-the way that people already often mark up text when they are writing
-plain text documents. Emphasis (*italics*) is added by surrounding a
-word with `*`. Strong emphasis (**bold**) is added using `**`. Lines
-starting with `#` are headings (and the number of `#`s is the subheading
-level). Any line starting with `-` is a bullet list item, and any line
-starting with a number + `.` is a numbered list item. Backtick is used
-to show words in `code font`, and a code block can be entered by
-indenting a line with four spaces or surrounding it with
-triple-backticks:
+Скорее всего на карьерном пути Вы столкнетесь с написанием текстов. 
+И как правило хочется иметь возможность разметить текст простым
+способом. Например, сделать текст жирным или курсивом, добавить
+заголовки, ссылки, куски кода. Вместо использования таких тяжелых
+инструментов, как Word или LaTeX, предлагаем Вам попробовать облегченный
+язык разметки [Markdown](https://commonmark.org/help/).
+    
+Вероятно Вы уже сталкивались с Markdown или по крайней мере с каким-то
+его вариантом. Так или иначе он частично используется и поддерживается
+практически везде, даже если не конкретно под своим именем. По своей сути,
+Markdown - это попытка конвертировать в код способ, которым люди обычно
+размечают текст, когда пишут простые текстовые документы. Акцент (*курсив*)
+добавляется при помощи `*` перед словом и после него. Сильный акцент 
+(**жирный**) - аналогично с помощью `**`. Строки, начинающиеся с `#`, 
+являются заголовками (причем количество `#`отражает уровень подзаголовка).
+Любая строка, начинающаяся с `-`, это пункт маркированного списка, а с 
+номером и `.` - нумерованного. Бэктик (обратный апостроф) применяется
+для выделения строки кода, а если Вам нужно вставить блок кода, используйте
+тройные бэктики:
 
     ```
-    code goes here
+    код начинается тут 
     ```
 
-To add a link, place the _text_ for the link in square brackets,
-and the URL immediately following that in parentheses: `[name](url)`.
-Markdown is easy to get started with, and you can use it nearly
-everywhere. In fact, the lecture notes for this lecture, and all the
-others, are written in Markdown, and you can see the raw Markdown
-[here](https://raw.githubusercontent.com/missing-semester/missing-semester/master/_2020/potpourri.md).
-
+Для добавления ссылки поместите _текст_  для ссылки в квадратные скобки,
+а сам URL сразу после в круглых скобках: `[name](url)`. Markdown довольно
+просто начать пользоваться, и Вы можете использовать его практически везде.
+На самом деле, заметки к этой и другим лекциям написаны на Markdown, и Вы 
+можете посмотреть на "сырой" Markdown [здесь](https://raw.githubusercontent.com/missing-semester/missing-semester/master/_2020/potpourri.md).
 
 
 ## Hammerspoon (desktop automation on macOS)
