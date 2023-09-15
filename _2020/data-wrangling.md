@@ -7,70 +7,69 @@ video:
   aspect: 56.25
   id: sz_dsktIjt4
 ---
+Вы когда-нибудь хотели взять данные в одном формате и преобразовать их в
+другой формат? Конечно! Это, в самых общих чертах, о чем эта лекция.
+В частности, массирование данных, будь то в текстовый или двоичный формат,
+пока не получите именно то, что хотели.
 
-Have you ever wanted to take data in one format and turn it into a
-different format? Of course you have! That, in very general terms, is
-what this lecture is all about. Specifically, massaging data, whether in
-text or binary format, until you end up with exactly what you wanted.
+На прошлых лекциях мы уже видели споры относительно некоторых базовых данных.
+Практически каждый раз, когда вы используете оператор `|`, вы выполняете какую-то
+операцию обработки данных. Рассмотрим команду типа `journalctl | grep -i intel.
+Она находит все записи логов, в которых упоминается Intel (без учета регистра).
+Вы можете не думать о ней как об обработке данных, но она преобразовывается из
+одного формата (весь ваш системный журнал) в более удобный для вас формат
+(просто логи Intel). Большая часть обработки данных связана с знанием того,
+какие инструменты которые есть в вашем распоряжении, и как их объединить.
 
-We've already seen some basic data wrangling in past lectures. Pretty
-much any time you use the `|` operator, you are performing some kind of
-data wrangling. Consider a command like `journalctl | grep -i intel`. It
-finds all system log entries that mention Intel (case insensitive). You
-may not think of it as wrangling data, but it is going from one format
-(your entire system log) to a format that is more useful to you (just
-the intel log entries). Most data wrangling is about knowing what tools
-you have at your disposal, and how to combine them.
+Начнём с самого начала. Чтобы обработать данные, нам нужны две вещи:
+данные, которые нужно обработать, и что-то с ними сделать. Логи часто
+создаются в качестве хорошего варианта использования, потому что вы часто
+хотите их исследовать, и прочитать всё невозможно. Давайте разберёмся,
+кто пытается войти на мой сервер, просмотрев журнал моего сервера:
 
-Let's start from the beginning. To wrangle data, we need two things:
-data to wrangle, and something to do with it. Logs often make for a good
-use-case, because you often want to investigate things about them, and
-reading the whole thing isn't feasible. Let's figure out who's trying to
-log into my server by looking at my server's log:
 
 ```bash
 ssh myserver journalctl
 ```
 
-That's far too much stuff. Let's limit it to ssh stuff:
+Пока слишком много деталей. Давайте ограничимся ssh:
 
 ```bash
 ssh myserver journalctl | grep sshd
 ```
 
-Notice that we're using a pipe to stream a _remote_ file through `grep`
-on our local computer! `ssh` is magical, and we will talk more about it
-in the next lecture on the command-line environment. This is still way
-more stuff than we wanted though. And pretty hard to read. Let's do
-better:
+Обратите внимание, что мы используем конвейер для потоковой передачи
+_remote_ файла через `grep` на нашем локальном компьютере!
+`ssh` — это волшебство, и мы еще поговорим об этом больше в следующей
+лекции о среде командной строки. Здесь всё ещё больше вещей чем мы бы
+хотели. И это довольно тяжело читать. Давайте сделаем лучше:
 
 ```bash
 ssh myserver 'journalctl | grep sshd | grep "Disconnected from"' | less
 ```
 
-Why the additional quoting? Well, our logs may be quite large, and it's
-wasteful to stream it all to our computer and then do the filtering.
-Instead, we can do the filtering on the remote server, and then massage
-the data locally. `less` gives us a "pager" that allows us to scroll up
-and down through the long output. To save some additional traffic while
-we debug our command-line, we can even stick the current filtered logs
-into a file so that we don't have to access the network while
-developing:
+Зачем дополнительное цитирование? Ну, наши журналы могут быть довольно большими,
+и это расточительно отправлять всё это на наш компьютер, а затем выполнять фильтрацию.
+Вместо этого мы можем выполнить фильтрацию на удалённом сервере, а затем массировать
+данные локально. `less` даёт нам "пейджер", который позволяет нам проходить вверх
+и вниз по длинному выводу. Чтобы сэкономить дополнительный трафик пока мы отлаживаем
+нашу командную строку, мы даже можем прикрепить текущие отфильтрованные логи в файл,
+чтобы нам не приходилось иметь доступ к сети во время разработки:
 
 ```console
 $ ssh myserver 'journalctl | grep sshd | grep "Disconnected from"' > ssh.log
 $ less ssh.log
 ```
 
-There's still a lot of noise here. There are _a lot_ of ways to get rid
-of that, but let's look at one of the most powerful tools in your
-toolkit: `sed`.
+Здесь по-прежнему много шума. Есть _много_ способов избавиться
+от этого, но давайте взглянем на один из самых мощных инструментов в вашей
+инструментарии: `sed`.
 
-`sed` is a "stream editor" that builds on top of the old `ed` editor. In
-it, you basically give short commands for how to modify the file, rather
-than manipulate its contents directly (although you can do that too).
-There are tons of commands, but one of the most common ones is `s`:
-substitution. For example, we can write:
+`sed` - это «потоковый редактор», созданный на основе старого редактора `ed`.
+В нём вы в основном даёте короткие команды для изменения файла, а не
+напрямую манипулируете его содержимым (хотя вы тоже можете это делать).
+Существует множество команд, но одна из наиболее распространённых — `s`:
+замена. Например, мы можем написать:
 
 ```bash
 ssh myserver journalctl
@@ -79,127 +78,121 @@ ssh myserver journalctl
  | sed 's/.*Disconnected from //'
 ```
 
-What we just wrote was a simple _regular expression_; a powerful
-construct that lets you match text against patterns. The `s` command is
-written on the form: `s/REGEX/SUBSTITUTION/`, where `REGEX` is the
-regular expression you want to search for, and `SUBSTITUTION` is the
-text you want to substitute matching text with.
+То, что мы только что написали, было простым _регулярным выражением_;
+мощная конструкция, позволяющая сопоставлять текст с шаблонами.
+Команда `s` записана в форме: `s/REGEX/SUBSTITUTION/`, где `REGEX` — это
+регулярное выражение, которое вы хотите найти, а `SUBSTITUTION` — это
+текст, которым вы хотите заменить соответствующий текст.
 
-(You may recognize this syntax from the "Search and replace" section of our Vim
-[lecture notes](/2020/editors/#advanced-vim)! Indeed, Vim uses a syntax for
-searching and replacing that is similar to `sed`'s substitution command.
-Learning one tool often helps you become more proficient with others.)
+(Вы можете узнать этот синтаксис из раздела «Поиск и замена» нашего
+руководства Vim. [конспекты лекций](https://missing-semester-rus.github.io/2020/editors/#advanced-vim)!
+Действительно, Vim использует синтаксис для поиска и замены аналогичны
+команде подстановки `sed`. Изучение одного инструмента часто помогает
+вам стать более опытным в использовании других.)
 
-## Regular expressions
+## Регулярные выражения
 
-Regular expressions are common and useful enough that it's worthwhile to
-take some time to understand how they work. Let's start by looking at
-the one we used above: `/.*Disconnected from /`. Regular expressions are
-usually (though not always) surrounded by `/`. Most ASCII characters
-just carry their normal meaning, but some characters have "special"
-matching behavior. Exactly which characters do what vary somewhat
-between different implementations of regular expressions, which is a
-source of great frustration. Very common patterns are:
+Регулярные выражения достаточно распространены и полезны, поэтому стоит
+потратить некоторое время для того, чтобы понять как они работают. Начнём
+с рассмотрения того, что мы использовали выше: `/.*Disconnected from /`.
+Регулярные выражения обычно (хотя и не всегда) окружены `/`. Большинство
+символов ASCII просто несут своё обычное значение, но некоторые символы
+имеют "особое" соответствующее поведение. Какие именно символы что делают
+несколько различается между различными реализациями регулярных выражений,
+что является источником большого разочарования. Очень распространены
+следующие шаблоны:
 
- - `.` means "any single character" except newline
- - `*` zero or more of the preceding match
- - `+` one or more of the preceding match
- - `[abc]` any one character of `a`, `b`, and `c`
- - `(RX1|RX2)` either something that matches `RX1` or `RX2`
- - `^` the start of the line
- - `$` the end of the line
+ - `.` означает "любой одиночный символ", кроме новой строки
+ - `*` ноль или более предыдущих совпадений
+ - `+` одно или несколько предыдущих совпадений
+ - `[abc]` любой символ из `a`, `b` и `c`
+ - `(RX1|RX2)` либо что-то, что соответствует `RX1` или `RX2`
+ - `^` начало строки
+ - `$` конец строки
 
-`sed`'s regular expressions are somewhat weird, and will require you to
-put a `\` before most of these to give them their special meaning. Or
-you can pass `-E`.
+`sed`'s регулярные выражения несколько странны и потребуют от вас поставить
+`\` перед большинством из них, чтобы придать им особое значение.
+Или вы можете поставить `-E`.
 
-So, looking back at `/.*Disconnected from /`, we see that it matches
-any text that starts with any number of characters, followed by the
-literal string "Disconnected from &rdquo;. Which is what we wanted. But
-{% comment %}
-note: the spelling of "trixy" below is intentional; see https://github.com/missing-semester/missing-semester/pull/84
-{% endcomment %}
-beware, regular expressions are trixy. What if someone tried to log in
-with the username "Disconnected from"? We'd have:
+Итак, оглядываясь назад на `/.*Disconnected from /`, мы видим, что он
+соответствует любому тексту, который начинается с любого количества символов,
+за которым следует литеральная строка "Disconnected from". Это то, что мы хотели.
+Но будьте осторожны, регулярные выражения каверзные. Что, если кто-то попытается
+войти в систему с именем пользователя "Disconnected from"? У нас будет:
 
 ```
 Jan 17 03:13:00 thesquareplanet.com sshd[2631]: Disconnected from invalid user Disconnected from 46.97.239.16 port 55920 [preauth]
 ```
 
-What would we end up with? Well, `*` and `+` are, by default, "greedy".
-They will match as much text as they can. So, in the above, we'd end up
-with just
+Что бы мы получили в итоге? Ну, `*` и `+` по умолчанию являются "жадными".
+Они будут соответствовать как можно большему количеству текста. Итак,
+как описано выше, мы в конечном итоге получим всего лишь
 
 ```
 46.97.239.16 port 55920 [preauth]
 ```
 
-Which may not be what we wanted. In some regular expression
-implementations, you can just suffix `*` or `+` with a `?` to make them
-non-greedy, but sadly `sed` doesn't support that. We _could_ switch to
-perl's command-line mode though, which _does_ support that construct:
+Возможно, это не то, чего мы хотели. В некоторых реализациях регулярных выражений,
+вы можете просто добавить к `*` или `+` символ `?`, чтобы сделать их не жадными,
+но, к сожалению, `sed` этого не поддерживает. Однако мы _могли_ переключиться
+на режим командной строки Perl, который _поддерживает_ эту конструкцию:
 
 ```bash
 perl -pe 's/.*?Disconnected from //'
 ```
 
-We'll stick to `sed` for the rest of this, because it's by far the more
-common tool for these kinds of jobs. `sed` can also do other handy
-things like print lines following a given match, do multiple
-substitutions per invocation, search for things, etc. But we won't cover
-that too much here. `sed` is basically an entire topic in and of itself,
-but there are often better tools.
+В оставшейся части этой лекции мы будем придерживаться `sed`, потому что это гораздо более
+обычный инструмент для такого рода работ. `sed` также может делать и другие полезные вещи,
+как печать строк после заданного совпадения, выполнение нескольких замен при вызове, поиск
+вещей и т.д. Но мы не будем рассматривать здесь всё. `sed` — это, по сути, целая тема сама
+по себе, но зачастую есть инструменты получше.
 
-Okay, so we also have a suffix we'd like to get rid of. How might we do
-that? It's a little tricky to match just the text that follows the
-username, especially if the username can have spaces and such! What we
-need to do is match the _whole_ line:
+Хорошо, у нас также есть суффикс, от которого мы хотели бы избавиться. Как мы могли бы
+сделать это? Немного сложно сопоставить только текст после имени пользователя, особенно
+если имя пользователя может содержать пробелы и тому подобное! Что нам нужно сделать,
+так это сопоставиться с _целой_ строкой:
 
 ```bash
  | sed -E 's/.*Disconnected from (invalid |authenticating )?user .* [^ ]+ port [0-9]+( \[preauth\])?$//'
 ```
 
-Let's look at what's going on with a [regex
-debugger](https://regex101.com/r/qqbZqh/2). Okay, so the start is still
-as before. Then, we're matching any of the "user" variants (there are
-two prefixes in the logs). Then we're matching on any string of
-characters where the username is. Then we're matching on any single word
-(`[^ ]+`; any non-empty sequence of non-space characters). Then the word
-"port" followed by a sequence of digits. Then possibly the suffix
-`[preauth]`, and then the end of the line.
+Давайте посмотрим, что происходит с [regex отладчик] (https://regex101.com/r/qqbZqh/2).
+Ладно, начинаем по-прежнему как прежде. Затем мы сопоставляем любой из "пользовательских"
+вариантов (есть два префикса в логах). Затем мы сопоставляем любую строку символов, где
+находится имя пользователя. Затем мы сопоставляем любое отдельное слово (`[^ ]+`; любую
+непустую последовательность символов, не являющихся пробелами). И после слово "порт", за
+которым следует последовательность цифр. Потом, возможно, суффикс `[preauth]`, а затем
+конец строки.
 
-Notice that with this technique, as username of "Disconnected from"
-won't confuse us any more. Can you see why?
+Обратите внимание, что при использовании этого метода в качестве имени пользователя
+"Disconnected from" нас больше не смутит. Вы понимаете, почему?
 
-There is one problem with this though, and that is that the entire log
-becomes empty. We want to _keep_ the username after all. For this, we
-can use "capture groups". Any text matched by a regex surrounded by
-parentheses is stored in a numbered capture group. These are available
-in the substitution (and in some engines, even in the pattern itself!)
-as `\1`, `\2`, `\3`, etc. So:
+Однако здесь есть одна проблема: весь лог становится пустым. В конце концов, мы хотим
+_сохранить_ имя пользователя. Для этого мы можем использовать мгруппы захвата". Любой
+текст, соответствующий регулярному выражению, окруженный круглыми скобками хранится в
+пронумерованной группе захвата. Они доступны в замене (а в некоторых движках даже в
+самой схеме!) как `\1`, `\2`, `\3` и т. д. Итак:
 
 ```bash
  | sed -E 's/.*Disconnected from (invalid |authenticating )?user (.*) [^ ]+ port [0-9]+( \[preauth\])?$/\2/'
 ```
 
-As you can probably imagine, you can come up with _really_ complicated
-regular expressions. For example, here's an article on how you might
-match an [e-mail
-address](https://www.regular-expressions.info/email.html). It's [not
-easy](https://emailregex.com/). And there's [lots of
-discussion](https://stackoverflow.com/questions/201323/how-to-validate-an-email-address-using-a-regular-expression/1917982).
-And people have [written
-tests](https://fightingforalostcause.net/content/misc/2006/compare-email-regex.php).
-And [test matrices](https://mathiasbynens.be/demo/url-regex). You can
-even write a regex for determining if a given number [is a prime
-number](https://www.noulakaz.net/2007/03/18/a-regular-expression-to-check-for-prime-numbers/).
+Как вы, наверное, можете себе представить, вы можете придумать _действительно_
+сложные регулярные выражения. Например, вот статья о том, как вы можете
+сопоставить [адрес электронной почты](https://www.regular-expressions.info/email.html).
+Это [не легко] (https://web.archive.org/web/20221223174323/http://emailregex.com/). И есть [много
+обсуждений] (https://stackoverflow.com/questions/201323/how-to-validate-an-email-address-using-a-regular-expression/1917982).
+И люди [написали тесты] (https://fightingforalostcause.net/content/misc/2006/compare-email-regex.php).
+И [тестовые матрицы](https://mathiasbynens.be/demo/url-regex). Вы можете
+даже написать регулярное выражение для определения того, является ли данное число [простым
+числом] (https://www.noulakaz.net/2007/03/18/a-regular-expression-to-check-for-prime-numbers/).
 
-Regular expressions are notoriously hard to get right, but they are also
-very handy to have in your toolbox!
+Регулярные выражения, как известно, сложны в верном написании, но они также
+очень удобны для того, чтобы иметь в своём инструментарии!
 
-## Back to data wrangling
+## Вернёмся к обработке данных
 
-Okay, so we now have
+Хорошо, теперь у нас есть
 
 ```bash
 ssh myserver journalctl
@@ -208,14 +201,12 @@ ssh myserver journalctl
  | sed -E 's/.*Disconnected from (invalid |authenticating )?user (.*) [^ ]+ port [0-9]+( \[preauth\])?$/\2/'
 ```
 
-`sed` can do all sorts of other interesting things, like injecting text
-(with the `i` command), explicitly printing lines (with the `p`
-command), selecting lines by index, and lots of other things. Check `man
-sed`!
+`sed` может делать много других интересных вещей, например, вставлять текст.
+(с помощью команды `i`), явная печать строк (с помощью команды `p`), выбирать
+строки по индексу и многое другое. Проверьте `man sed`!
 
-Anyway. What we have now gives us a list of all the usernames that have
-attempted to log in. But this is pretty unhelpful. Let's look for common
-ones:
+В любом случае. Теперь мы имеем список всех имён пользователей, которые
+попытались войти в систему. Но это бесполезно. Давайте искать обобощённые:
 
 ```bash
 ssh myserver journalctl
@@ -225,10 +216,10 @@ ssh myserver journalctl
  | sort | uniq -c
 ```
 
-`sort` will, well, sort its input. `uniq -c` will collapse consecutive
-lines that are the same into a single line, prefixed with a count of the
-number of occurrences. We probably want to sort that too and only keep
-the most common usernames:
+`sort` отсортирует входные данные. `uniq -c` будет сворачивать последовательные
+одинаковые строки в одну строку с префиксом количества вхождений. Мы, вероятно,
+тоже хотим отсортировать это и оставить только наиболее распространённые имена
+пользователей:
 
 ```bash
 ssh myserver journalctl
@@ -239,17 +230,18 @@ ssh myserver journalctl
  | sort -nk1,1 | tail -n10
 ```
 
-`sort -n` will sort in numeric (instead of lexicographic) order. `-k1,1`
-means "sort by only the first whitespace-separated column". The `,n`
-part says "sort until the `n`th field, where the default is the end of
-the line. In this _particular_ example, sorting by the whole line
-wouldn't matter, but we're here to learn!
+`sort -n` будет сортировать в числовом (а не лексикографическом) порядке. `-k1,1`
+означает "сортировать только по первому столбцу, разделенному пробелами". `, n`
+часть говорит: "Сортировать до n-го поля, где по умолчанию находится конец
+линия". В этом _конкретном_ примере сортировка по всей строке не имеет значения,
+но мы здесь, чтобы учиться!
 
-If we wanted the _least_ common ones, we could use `head` instead of
-`tail`. There's also `sort -r`, which sorts in reverse order.
+Если бы нам нужны были _наименее_ распространенные_, мы могли бы использовать `head`
+вместо `tail`. Также есть `sort -r`, который сортирует в обратном порядке.
 
-Okay, so that's pretty cool, but what if we'd like these extract only the usernames
-as a comma-separated list instead of one per line, perhaps for a config file?
+Хорошо, это довольно круто, но что, если мы хотим, чтобы они извлекали только имена
+пользователей в виде списка, разделённого запятыми, а не по одному в строке, возможно,
+для конфигурационного файла?
 
 ```bash
 ssh myserver journalctl
@@ -261,40 +253,47 @@ ssh myserver journalctl
  | awk '{print $2}' | paste -sd,
 ```
 
-Let's start with `paste`: it lets you combine lines (`-s`) by a given
-single-character delimiter (`-d`; `,` in this case). But what's this `awk` business?
+Если вы используете macOS: обратите внимание, что показанная команда не будет
+работать с BSD `paste` поставляемя в macOS. См. [упражнение 4 из инструментов
+оболочки лекция](https://missing-semester-rus.github.io/2020/shell-tools/#exercisions), чтобы узнать больше о
+разнице между BSD и GNU coreutils, а также инструкции по установке GNU coreutils
+на macOS.
 
-## awk -- another editor
+Начнем с `paste`: она позволяет объединять строки (`-s`) по заданному значению.
+односимвольный разделитель (в данном случае `-d`; `,`). Но что делает `awk`?
 
-`awk` is a programming language that just happens to be really good at
-processing text streams. There is _a lot_ to say about `awk` if you were
-to learn it properly, but as with many other things here, we'll just go
-through the basics.
+## awk -- другой редактор
 
-First, what does `{print $2}` do? Well, `awk` programs take the form of
-an optional pattern plus a block saying what to do if the pattern
-matches a given line. The default pattern (which we used above) matches
-all lines. Inside the block, `$0` is set to the entire line's contents,
-and `$1` through `$n` are set to the `n`th _field_ of that line, when
-separated by the `awk` field separator (whitespace by default, change
-with `-F`). In this case, we're saying that, for every line, print the
-contents of the second field, which happens to be the username!
+`awk` — это язык программирования, который действительно хорошо справляется
+с обработкой текстовых потоков. _Много чего_ можно было бы сказать о `awk`,
+чтобы изучить должным образом, но, как и с многими другими вещами здесь,
+мы просто изучим основы.
 
-Let's see if we can do something fancier. Let's compute the number of
-single-use usernames that start with `c` and end with `e`:
+Во-первых, что делает `{print $2}`? Ну, программы `awk` принимают форму
+необязательного шаблона плюс блока, говорящего, что делать, если шаблон
+соответствует заданной строке. Шаблон по умолчанию (который мы использовали
+выше) соответствует всем линиям. Внутри блока, `$0` устанавливается на всё
+содержимое строки, и от $1 до $n устанавливаются в n-е _поле_ этой строки,
+когда разделены разделены полевым разделителем `awk` (пробелы по умолчанию,
+измените с `-F`). В данном случае мы говорим для каждой строки вывести
+содержимое второго поля, которое является именем пользователя!
+
+Посмотрим, сможем ли мы сделать что-нибудь более изысканное. Давайте посчитаем
+количество одноразовых имён пользователей, которые начинаются с `c` и
+заканчиваются на `e`:
 
 ```bash
  | awk '$1 == 1 && $2 ~ /^c[^ ]*e$/ { print $2 }' | wc -l
 ```
 
-There's a lot to unpack here. First, notice that we now have a pattern
-(the stuff that goes before `{...}`). The pattern says that the first
-field of the line should be equal to 1 (that's the count from `uniq
--c`), and that the second field should match the given regular
-expression. And the block just says to print the username. We then count
-the number of lines in the output with `wc -l`.
+Здесь есть что раскрыть. Во-первых, обратите внимание, что теперь
+у нас есть шаблон (то, что идет перед `{...}`). В шаблоне сказано,
+что первое поле строки должно быть равно 1 (это счётчик из `uniq
+-c`), и что второе поле должно соответствовать заданному обычному
+выражению. И блок просто говорит напечатать имя пользователя.
+Затем мы считаем количество строк в выводе с помощью `wc -l`.
 
-However, `awk` is a programming language, remember?
+Однако `awk` — это язык программирования, помните?
 
 ```awk
 BEGIN { rows = 0 }
@@ -302,33 +301,33 @@ $1 == 1 && $2 ~ /^c[^ ]*e$/ { rows += $1 }
 END { print rows }
 ```
 
-`BEGIN` is a pattern that matches the start of the input (and `END`
-matches the end). Now, the per-line block just adds the count from the
-first field (although it'll always be 1 in this case), and then we print
-it out at the end. In fact, we _could_ get rid of `grep` and `sed`
-entirely, because `awk` [can do it
-all](https://backreference.org/2010/02/10/idiomatic-awk/), but we'll
-leave that as an exercise to the reader.
+`BEGIN` — это шаблон, который соответствует началу ввода (и `END`
+соответствует концу). Теперь построчный блок просто добавляет счётчик
+из первого поля (хотя в этом случае он всегда будет равен 1), а затем
+печатаем его в конце. Фактически, мы _могли_ избавиться от `grep` и `sed`
+полностью, потому что `awk` [может это сделать полностью](https://backreference.org/2010/02/10/idiomatic-awk/),
+но мы оставили это в качестве упражнения читателю.
 
-## Analyzing data
+## Анализ данных
 
-You can do math directly in your shell using `bc`, a calculator that can read 
-from STDIN! For example, add the numbers on each line together by concatenating
-them together, delimited by `+`:
+Вы можете выполнять математические вычисления прямо в своей оболочке,
+используя `bc`, калькулятор, который может читать из STDIN! Например,
+сложите числа в каждой строке путём конкатенирования их вместе, разделяя
+их знаком `+`:
 
 ```bash
  | paste -sd+ | bc -l
 ```
 
-Or produce more elaborate expressions:
+Или создайте более сложные выражения:
 
 ```bash
 echo "2*($(data | paste -sd+))" | bc -l
 ```
 
-You can get stats in a variety of ways.
-[`st`](https://github.com/nferraz/st) is pretty neat, but if you already
-have [R](https://www.r-project.org/):
+Статистику можно получить разными способами.
+[`st`](https://github.com/nferraz/st) — это довольно здорово, но если
+у вас уже есть [R](https://www.r-project.org/):
 
 ```bash
 ssh myserver journalctl
@@ -336,16 +335,16 @@ ssh myserver journalctl
  | grep "Disconnected from"
  | sed -E 's/.*Disconnected from (invalid |authenticating )?user (.*) [^ ]+ port [0-9]+( \[preauth\])?$/\2/'
  | sort | uniq -c
- | awk '{print $1}' | R --slave -e 'x <- scan(file="stdin", quiet=TRUE); summary(x)'
+ | awk '{print $1}' | R --no-echo -e 'x <- scan(file="stdin", quiet=TRUE); summary(x)'
 ```
 
-R is another (weird) programming language that's great at data analysis
-and [plotting](https://ggplot2.tidyverse.org/). We won't go into too
-much detail, but suffice to say that `summary` prints summary statistics
-for a vector, and we created a vector containing the input stream of
-numbers, so R gives us the statistics we wanted!
+R — еще один (странный) язык программирования, который отлично подходит
+для анализа данных и [построения графиков](https://ggplot2.tidyverse.org/).
+Мы не будем вдаваться в подробности, но достаточно сказать, что `summary`
+печатает сводную статистику для вектора, и мы создали вектор, содержащий
+входной поток чисел, поэтому R даёт нам ту статистику, которую мы хотели!
 
-If you just want some simple plotting, `gnuplot` is your friend:
+Если вам просто нужно простое построение графиков, `gnuplot` — ваш друг:
 
 ```bash
 ssh myserver journalctl
@@ -357,28 +356,29 @@ ssh myserver journalctl
  | gnuplot -p -e 'set boxwidth 0.5; plot "-" using 1:xtic(2) with boxes'
 ```
 
-## Data wrangling to make arguments
+## Обработка данных для создания аргументов
 
-Sometimes you want to do data wrangling to find things to install or
-remove based on some longer list. The data wrangling we've talked about
-so far + `xargs` can be a powerful combo.
+Иногда вам нужно провести обработку данных, чтобы найти что-то для
+установки или удалить на основе более длинного списка. Обработка
+данных, о которой мы говорили на данный момент + `xargs` может быть
+мощной комбинацией.
 
-For example, as seen in lecture, I can use the following command to uninstall
-old nightly builds of Rust from my system by extracting the old build names
-using data wrangling tools and then passing them via `xargs` to the
-uninstaller:
+Например, как показано в лекции, я могу использовать следующую команду
+для удаления старых сборок Rust из моей системы, извлекая имена старых
+сборок, используя инструменты обработки данных, а затем передавая их
+через `xargs` в деинсталлятор:
 
 ```bash
 rustup toolchain list | grep nightly | grep -vE "nightly-x86" | sed 's/-x86.*//' | xargs rustup toolchain uninstall
 ```
 
-## Wrangling binary data
+## Обработка двоичных данных
 
-So far, we have mostly talked about wrangling textual data, but pipes
-are just as useful for binary data. For example, we can use ffmpeg to
-capture an image from our camera, convert it to grayscale, compress it,
-send it to a remote machine over SSH, decompress it there, make a copy,
-and then display it.
+До сих пор, мы в основном говорили об обработке текстовых данных, но
+конвейеры столь же полезны для двоичных данных. Например, мы можем использовать
+ffmpeg для захвата изображения с нашей камеры, преобразовать его в оттенки
+серого, сжать, отправьте его на удаленную машину через SSH, распаковать там,
+сделайте копию, а затем отобразить его.
 
 ```bash
 ffmpeg -loglevel panic -i /dev/video0 -frames 1 -f image2 -
@@ -387,57 +387,55 @@ ffmpeg -loglevel panic -i /dev/video0 -frames 1 -f image2 -
  | ssh mymachine 'gzip -d | tee copy.jpg | env DISPLAY=:0 feh -'
 ```
 
-# Exercises
+# Упражнения
 
-1. Take this [short interactive regex tutorial](https://regexone.com/).
-2. Find the number of words (in `/usr/share/dict/words`) that contain at
-   least three `a`s and don't have a `'s` ending. What are the three
-   most common last two letters of those words? `sed`'s `y` command, or
-   the `tr` program, may help you with case insensitivity. How many
-   of those two-letter combinations are there? And for a challenge:
-   which combinations do not occur?
-3. To do in-place substitution it is quite tempting to do something like
-   `sed s/REGEX/SUBSTITUTION/ input.txt > input.txt`. However this is a
-   bad idea, why? Is this particular to `sed`? Use `man sed` to find out
-   how to accomplish this.
-4. Find your average, median, and max system boot time over the last ten
-   boots. Use `journalctl` on Linux and `log show` on macOS, and look
-   for log timestamps near the beginning and end of each boot. On Linux,
-   they may look something like:
+1. Возьмите это [short interactive regex tutorial](https://regexone.com/).
+2. Найдите количество слов (в `/usr/share/dict/words`), содержащие
+   минимум три буквы `a` и не имеющие окончания `'s`. Какие три
+   наиболее распространённые последние две буквы этих слов? `sed`'s `y`
+   команда или программа `tr` может помочь вам с нечувствительностью к
+   регистру. Сколько из этих двухбуквенных комбинаций есть? И ради вызова:
+   какие комбинации не встречаются?
+3. Чтобы выполнить замену на месте, весьма заманчиво сделать что-то вроде
+   `sed s/REGEX/SUBSTITUTION/ input.txt > input.txt`. Однако это
+   плохая идея, почему? Это особенность `sed`? Используйте `man sed`,
+   чтобы узнать как это сделать.
+4. Найдите среднее, медианное и максимальное время загрузки системы за
+   последние десять запусков. Используйте `journalctl` в Linux и `log show`
+   в macOS, и посмотрите логи временных меток в начале и в конце каждой
+   загрузки. В Linux, они могут выглядеть примерно так:
+   
    ```
    Logs begin at ...
    ```
-   and
+   и
    ```
    systemd[577]: Startup finished in ...
    ```
-   On macOS, [look
-   for](https://eclecticlight.co/2018/03/21/macos-unified-log-3-finding-your-way/):
+   В macOS, [ищите](https://eclecticlight.co/2018/03/21/macos-unified-log-3-finding-your-way/):
    ```
    === system boot:
    ```
-   and
+   и
    ```
    Previous shutdown cause: 5
    ```
-5. Look for boot messages that are _not_ shared between your past three
-   reboots (see `journalctl`'s `-b` flag). Break this task down into
-   multiple steps. First, find a way to get just the logs from the past
-   three boots. There may be an applicable flag on the tool you use to
-   extract the boot logs, or you can use `sed '0,/STRING/d'` to remove
-   all lines previous to one that matches `STRING`. Next, remove any
-   parts of the line that _always_ varies (like the timestamp). Then,
-   de-duplicate the input lines and keep a count of each one (`uniq` is
-   your friend). And finally, eliminate any line whose count is 3 (since
-   it _was_ shared among all the boots).
-6. Find an online data set like [this
-   one](https://stats.wikimedia.org/EN/TablesWikipediaZZ.htm), [this
-   one](https://ucr.fbi.gov/crime-in-the-u.s/2016/crime-in-the-u.s.-2016/topic-pages/tables/table-1),
-   or maybe one [from
-   here](https://www.springboard.com/blog/free-public-data-sets-data-science-project/).
-   Fetch it using `curl` and extract out just two columns of numerical
-   data. If you're fetching HTML data,
-   [`pup`](https://github.com/EricChiang/pup) might be helpful. For JSON
-   data, try [`jq`](https://stedolan.github.io/jq/). Find the min and
-   max of one column in a single command, and the difference of the sum
-   of each column in another.
+5. Ищите загрузочные сообщения, которые _не_ являются общими для трёх
+   последних перезагрузок (см. флаг `-b` `journalctl`). Разбейте эту
+   задачу на несколько шагов. Во-первых, найдите способ получить только
+   логи из прошлых трёх запусков. На том, что вы используете, извлеките
+   логи загрузок или вы можете использовать `sed '0,/STRING/d'` для
+   удаления всех строк, предшествующих строке, соответствующей `STRING`.
+   Далее удалите все части строки, которые _всегда_ меняются (например,
+   временная метка). Затем, дедуплицируйте входные строки и ведите
+   подсчёт каждой из них (`uniq` ваш друг). И, наконец, удалите любую
+   строку, счётчик которой равен 3 (поскольку он _был_ общим для всех
+   загрузок).
+6. Найдите онлайн-набор данных, подобный [этому](https://stats.wikimedia.org/EN/TablesWikipediaZZ.htm),
+   [этому](https://ucr.fbi.gov/crime-in-the-u.s/2016/crime-in-the-u.s.-2016/topic-pages/tables/table-1),
+   или, может быть, [одному из этих](https://www.springboard.com/blog/data-science/free-public-data-sets-data-science-project/).
+   Получите его с помощью `curl` и извлеките только два столбца
+   числовых значений данных. Если вы получаете данные HTML, [`pup`](https://github.com/EricChiang/pup)
+   может оказаться полезным. Для JSON данных, попробуйте [`jq`](https://stedolan.github.io/jq/).
+   Найдите минимальное и максимальное одного столбца одной командой и разницу сумм
+   каждого столбца другой командой.
