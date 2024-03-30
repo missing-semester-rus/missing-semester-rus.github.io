@@ -5,18 +5,21 @@
 Перевод на русский: [Пропущенный семестр курса по компьютерным наукам](https://missing-semester-rus.github.io/).
 
 Перевод не авторизован. Вы можете принять участие в переводе лекций. 
-Контрибьюторы: [@chmsv](https://github.com/chmsv), [@LaRRu](https://github.com/LaRRu), [@kershik](https://github.com/kershik), [@amordo](https://github.com/amordo)
+Контрибьюторы: [@chmsv](https://github.com/chmsv), [@LaRRu](https://github.com/LaRRu), [@kershik](https://github.com/kershik), [@amordo](https://github.com/amordo), [@Podidiving](https://github.com/Podidiving)
 
 ## Переведенные лекции 
 
 - Обзор курса + знакомство с оболочкой
 - Скрипты
 - Текстовые редакторы (Vim)
+- Среда командой строки
+- Отладка и Профилирование
 - Метапрограммирование
+- Безопасность и Криптография
 
-## Development
+## Разработка
 
-To build and view the site locally, run:
+Чтобы собрать и запустить сайт локально, используйте команду:
 
 ```bash
 bundle exec jekyll serve -w
