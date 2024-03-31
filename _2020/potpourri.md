@@ -10,19 +10,21 @@ video:
 
 ## Содержание
 
+- [Содержание](#содержание)
 - [Настройка клавиатуры](#настройка-клавиатуры)
-- [Daemons](#daemons)
+- [Демоны (Daemons)](#демоны-daemons)
 - [FUSE](#fuse)
-- [Backups](#backups)
+- [Резервное копирование](#резервное-копирование)
 - [API](#api)
-- [Common command-line flags/patterns](#common-command-line-flagspatterns)
+- [Общие флаги/шаблоны командной строки](#общие-флагишаблоны-командной-строки)
 - [Оконные менеджеры](#оконные-менеджеры)
 - [VPN](#vpn)
 - [Markdown](#markdown)
-- [Hammerspoon (desktop automation on macOS)](#hammerspoon-desktop-automation-on-macos)
+- [Hammerspoon (автоматизация рабочего стола на macOS)](#hammerspoon-автоматизация-рабочего-стола-на-macos)
+  - [Resources](#resources)
 - [Booting + Live USBs](#booting--live-usbs)
 - [Docker, Vagrant, VMs, Cloud, OpenStack](#docker-vagrant-vms-cloud-openstack)
-- [Notebook programming](#notebook-programming)
+- [Программирование в ноутбуках](#программирование-в-ноутбуках)
 - [GitHub](#github)
 
 ## Настройка клавиатуры
@@ -51,20 +53,25 @@ video:
 - Windows - [AutoHotkey](https://www.autohotkey.com/) или [SharpKeys](https://www.randyrants.com/category/sharpkeys/)
 - QMK - Если Ваша клавиатура поддерживает кастомную прошивку, можно использовать [QMK](https://docs.qmk.fm/) для настройки самого устройства, так что Ваши переопредления будут работать для любого ПК, с которым Вы используете данную клавиатуру. 
 
-## Daemons
+## Демоны (Daemons)
 
-You are probably already familiar with the notion of daemons, even if the word seems new.
-Most computers have a series of processes that are always running in the background rather than waiting for a user to launch them and interact with them.
-These processes are called daemons and the programs that run as daemons often end with a `d` to indicate so.
-For example `sshd`, the SSH daemon, is the program responsible for listening to incoming SSH requests and checking that the remote user has the necessary credentials to log in.
+Вы, вероятно, уже знакомы с понятием демонов, даже если это слово кажется новым. 
+Большинство компьютеров имеют ряд процессов, которые всегда работают в фоновом режиме, 
+а не ждут, когда пользователь их запустит и начнет с ними взаимодействовать. Эти процессы называются демонами, 
+и программы, которые работают как демоны, часто заканчиваются на `d`, чтобы указать на это. 
+Например, `sshd`, демон SSH, отвечает за обработку входящих запросов SSH и проверку того, 
+что удаленный пользователь имеет необходимые учетные данные для входа в систему.
 
-In Linux, `systemd` (the system daemon) is the most common solution for running and setting up daemon processes.
-You can run `systemctl status` to list the current running daemons. Most of them might sound unfamiliar but are responsible for core parts of the system such as managing the network, solving DNS queries or displaying the graphical interface for the system.
-Systemd can be interacted with the `systemctl` command in order to `enable`, `disable`, `start`, `stop`, `restart` or check the `status` of services (those are the `systemctl` commands).
+В Linux `systemd` (системный демон) - это наиболее распространенное решение для запуска 
+и настройки процессов-демонов. Вы можете выполнить `systemctl status`, чтобы перечислить 
+текущие работающие демоны. Большинство из них могут показаться незнакомыми, но они отвечают 
+за основные части системы, такие как управление сетью, решение DNS-запросов или отображение графического интерфейса системы. 
+С Systemd можно взаимодействовать с помощью команды `systemctl`, 
+чтобы `enable`, `disable`, `start`, `stop`, `restart` или проверить `status` сервисов.
 
-More interestingly, `systemd` has a fairly accessible interface for configuring and enabling new daemons (or services).
-Below is an example of a daemon for running a simple Python app.
-We won't go in the details but as you can see most of the fields are pretty self explanatory.
+Что более интересно, `systemd` имеет доступный интерфейс для настройки и включения новых демонов (или сервисов). 
+Ниже приведен пример демона для запуска простого приложения Python. Мы не будем вдаваться в 
+подробности, но, как вы можете видеть, большинство полей довольно понятны.
 
 ```ini
 # /etc/systemd/system/myapp.service
@@ -83,51 +90,52 @@ Restart=on-failure
 WantedBy=multi-user.target
 ```
 
-Also, if you just want to run some program with a given frequency there is no need to build a custom daemon, you can use [`cron`](https://www.man7.org/linux/man-pages/man8/cron.8.html), a daemon your system already runs to perform scheduled tasks.
+Также, если вы просто хотите запустить какую-то программу с заданной частотой, вам не нужно создавать собственного демона, вы можете использовать [`cron`](https://www.man7.org/linux/man-pages/man8/cron.8.html), демон, который ваша система уже запускает для выполнения запланированных задач.
 
 ## FUSE
 
-Modern software systems are usually composed of smaller building blocks that are composed together.
-Your operating system supports using different filesystem backends because there is a common language of what operations a filesystem supports.
-For instance, when you run `touch` to create a file, `touch` performs a system call to the kernel to create the file and the kernel performs the appropriate filesystem call to create the given file.
-A caveat is that UNIX filesystems are traditionally implemented as kernel modules and only the kernel is allowed to perform filesystem calls.
+Современные программные системы обычно состоят из меньших строительных блоков, которые объединяются вместе.
+Ваша операционная система поддерживает использование различных файловых систем, потому что есть общий язык операций, которые поддерживает файловая система.
+Например, когда вы запускаете `touch` для создания файла, `touch` выполняет системный вызов к ядру для создания файла, а ядро выполняет соответствующий вызов файловой системе для создания данного файла.
+Однако стоит отметить, что файловые системы UNIX традиционно реализуются как модули ядра, и только ядро может выполнять вызовы файловой системы.
 
-[FUSE](https://en.wikipedia.org/wiki/Filesystem_in_Userspace) (Filesystem in User Space) allows filesystems to be implemented by a user program. FUSE lets users run user space code for filesystem calls and then bridges the necessary calls to the kernel interfaces.
-In practice, this means that users can implement arbitrary functionality for filesystem calls.
+[FUSE](https://en.wikipedia.org/wiki/Filesystem_in_Userspace) (Filesystem in User Space, Файловая система в пользовательском пространстве) позволяет реализовывать файловые системы с помощью пользовательской программы. FUSE позволяет пользователям запускать код пользовательского пространства для вызовов файловой системы, а затем связывает необходимые вызовы с интерфейсами ядра.
+На практике это означает, что пользователи могут реализовывать произвольную функциональность для вызовов файловой системы.
 
-For example, FUSE can be used so whenever you perform an operation in a virtual filesystem, that operation is forwarded through SSH to a remote machine, performed there, and the output is returned back to you.
-This way, local programs can see the file as if it was in your computer while in reality it's in a remote server.
-This is effectively what `sshfs` does.
+Например, FUSE можно использовать так, что при выполнении операции в виртуальной файловой системе, эта операция перенаправляется через SSH на удаленную машину, выполняется там, и результат возвращается обратно к вам.
+Таким образом, локальные программы могут видеть файл, как если бы он был на вашем компьютере, хотя на самом деле он находится на удаленном сервере.
+Это в основном то, что делает `sshfs`.
 
-Some interesting examples of FUSE filesystems are:
-- [sshfs](https://github.com/libfuse/sshfs) - Open locally remote files/folder through an SSH connection.
-- [rclone](https://rclone.org/commands/rclone_mount/) - Mount cloud storage services like Dropbox, GDrive, Amazon S3 or Google Cloud Storage and open data locally.
-- [gocryptfs](https://nuetzlich.net/gocryptfs/) - Encrypted overlay system. Files are stored encrypted but once the FS is mounted they appear as plaintext in the mountpoint.
-- [kbfs](https://keybase.io/docs/kbfs) - Distributed filesystem with end-to-end encryption. You can have private, shared and public folders.
-- [borgbackup](https://borgbackup.readthedocs.io/en/stable/usage/mount.html) - Mount your deduplicated, compressed and encrypted backups for ease of browsing.
+Некоторые интересные примеры файловых систем FUSE:
+- [sshfs](https://github.com/libfuse/sshfs) - Открывайте удаленные файлы/папки локально через SSH-соединение.
+- [rclone](https://rclone.org/commands/rclone_mount/) - Монтируйте облачные хранилища данных, такие как Dropbox, GDrive, Amazon S3 или Google Cloud Storage, и открывайте данные локально.
+- [gocryptfs](https://nuetzlich.net/gocryptfs/) - Система шифрования. Файлы хранятся в зашифрованном виде, но после монтирования ФС они появляются как обычный текст в точке монтирования.
+- [kbfs](https://keybase.io/docs/kbfs) - Распределенная файловая система со сквозным шифрованием. У вас могут быть приватные, общие и публичные папки.
+- [borgbackup](https://borgbackup.readthedocs.io/en/stable/usage/mount.html) - Монтируйте свои дедуплицированные, сжатые и зашифрованные резервные копии для удобства просмотра.
 
-## Backups
 
-Any data that you haven’t backed up is data that could be gone at any moment, forever.
-It's easy to copy data around, it's hard to reliably backup data.
-Here are some good backup basics and the pitfalls of some approaches.
+## Резервное копирование
 
-First, a copy of the data in the same disk is not a backup, because the disk is the single point of failure for all the data. Similarly, an external drive in your home is also a weak backup solution since it could be lost in a fire/robbery/&c. Instead, having an off-site backup is a recommended practice.
+Любые данные, которые вы не резервировали, могут в любой момент исчезнуть навсегда.
+Копировать данные легко, но сложно надежно резервировать данные.
+Вот несколько основных принципов резервного копирования и подводные камни некоторых подходов.
 
-Synchronization solutions are not backups. For instance, Dropbox/GDrive are convenient solutions, but when data is erased or corrupted they propagate the change. For the same reason, disk mirroring solutions like RAID are not backups. They don't help if data gets deleted, corrupted or encrypted by ransomware.
+Во-первых, копия данных на том же диске не является резервной копией, потому что диск является единой точкой отказа. Аналогично, внешний диск у вас дома также является слабым решением для резервного копирования, поскольку он может быть потерян при пожаре/грабеже и т.д. Вместо этого рекомендуется иметь резервную копию в другом месте.
 
-Some core features of good backups solutions are versioning, deduplication and security.
-Versioning backups ensure that you can access your history of changes and efficiently recover files.
-Efficient backup solutions use data deduplication to only store incremental changes and reduce the storage overhead.
-Regarding security, you should ask yourself what someone would need to know/have in order to read your data and, more importantly, to delete all your data and associated backups.
-Lastly, blindly trusting backups is a terrible idea and you should verify regularly that you can use them to recover data.
+Синхронизация не является резервным копированием. Например, Dropbox/GDrive - удобные решения, но когда данные стираются или повреждаются, эти повреждения распространяются на синхронизированные файлы. По той же причине решения для зеркалирования дисков, такие как RAID, не являются резервными копиями. Они не помогают, если данные удаляются, повреждаются или шифруются вирусом-вымогателем.
 
-Backups go beyond local files in your computer.
-Given the significant growth of web applications, large amounts of your data are only stored in the cloud.
-For instance, your webmail, social media photos, music playlists in streaming services or online docs are gone if you lose access to the corresponding accounts.
-Having an offline copy of this information is the way to go, and you can find online tools that people have built to fetch the data and save it.
+Некоторые основные функции хороших решений для резервного копирования - это версионирование, дедупликация и безопасность.
+Версионирование резервных копий гарантирует, что вы можете получить доступ к истории изменений и эффективно восстановить файлы.
+Эффективные решения для резервного копирования используют дедупликацию данных, чтобы хранить только инкрементные изменения и снизить накладные расходы на хранение.
+Что касается безопасности, вы должны спросить себя, что нужно знать/иметь, чтобы прочитать ваши данные и, что более важно, удалить все ваши данные и связанные резервные копии.
+Наконец, слепое доверие резервным копиям - ужасная идея, и вы должны регулярно проверять, что вы можете использовать их для восстановления данных.
 
-For a more detailed explanation, see 2019's lecture notes on [Backups](/2019/backups).
+Резервное копирование выходит за рамки локальных файлов на вашем компьютере.
+Учитывая значительный рост веб-приложений, большое количество ваших данных хранится только в облаке.
+Например, ваша веб-почта, фотографии в социальных сетях, плейлисты музыки в стриминговых сервисах или онлайн-документы исчезают, если вы потеряете доступ к соответствующим аккаунтам.
+Наличие офлайн-копии этой информации - это правильный подход, и вы можете найти онлайн-инструменты, которые люди создали для извлечения данных и их сохранения.
+
+Для более подробного объяснения см. лекционные материалы 2019 года о [Резервном копировании](/2019/backups).
 
 
 ## API
@@ -164,37 +172,19 @@ For a more detailed explanation, see 2019's lecture notes on [Backups](/2019/bac
 Он позволяет объединять события различных сервисов в произвольную цепочку. Стоит
 взглянуть!
 
-## Common command-line flags/patterns
+## Общие флаги/шаблоны командной строки
 
-Command-line tools vary a lot, and you will often want to check out
-their `man` pages before using them. They often share some common
-features though that can be good to be aware of:
+Инструменты командной строки очень разные, и перед их использованием 
+вам часто придется просматривать их `man` страницы. Однако у них есть некоторые общие 
+особенности, о которых полезно знать:
 
- - Most tools support some kind of `--help` flag to display brief usage
-   instructions for the tool.
- - Many tools that can cause irrevocable change support the notion of a
-   "dry run" in which they only print what they _would have done_, but
-   do not actually perform the change. Similarly, they often have an
-   "interactive" flag that will prompt you for each destructive action.
- - You can usually use `--version` or `-V` to have the program print its
-   own version (handy for reporting bugs!).
- - Almost all tools have a `--verbose` or `-v` flag to produce more
-   verbose output. You can usually include the flag multiple times
-   (`-vvv`) to get _more_ verbose output, which can be handy for
-   debugging. Similarly, many tools have a `--quiet` flag for making it
-   only print something on error.
- - In many tools, `-` in place of a file name means "standard input" or
-   "standard output", depending on the argument.
- - Possibly destructive tools are generally not recursive by default,
-   but support a "recursive" flag (often `-r`) to make them recurse.
- - Sometimes, you want to pass something that _looks_ like a flag as a
-   normal argument. For example, imagine you wanted to remove a file
-   called `-r`. Or you want to run one program "through" another, like
-   `ssh machine foo`, and you want to pass a flag to the "inner" program
-   (`foo`). The special argument `--` makes a program _stop_ processing
-   flags and options (things starting with `-`) in what follows, letting
-   you pass things that look like flags without them being interpreted
-   as such: `rm -- -r` or `ssh machine --for-ssh -- foo --for-foo`.
+ - Большинство инструментов поддерживают флаг `--help` для отображения краткой инструкции по использованию инструмента.
+ - Многие инструменты, которые могут вызвать необратимые изменения, поддерживают понятие "сухого прогона" (dry-run), в котором они только печатают то, что они _собирались сделать_, но на самом деле не производят изменения. Аналогично, у них часто есть флаг "интерактивный", который будет запрашивать у вас подтверждение для каждого необратимого действия.
+ - Обычно вы можете использовать `--version` или `-V`, чтобы программа напечатала свою версию (удобно для сообщения об ошибках!).
+ - Почти все инструменты имеют флаг `--verbose` или `-v` для вывода более подробной информации. Обычно вы можете включить флаг несколько раз (`-vvv`), чтобы получить _более_ подробный вывод, что может быть полезно для отладки. Аналогично, у многих инструментов есть флаг `--quiet` для вывода информации только в случае ошибки.
+ - Во многих инструментах `-` вместо имени файла означает "стандартный ввод" или "стандартный вывод", в зависимости от аргумента.
+ - Потенциально разрушительные инструменты обычно не рекурсивны по умолчанию, но поддерживают флаг "рекурсивный" (часто `-r`), чтобы сделать их рекурсивными.
+ - Иногда вы хотите передать что-то, что _выглядит_ как флаг, в качестве обычного аргумента. Например, представьте, что вы хотите удалить файл с именем `-r`. Или вы хотите запустить одну программу "через" другую, например `ssh machine foo`, и вы хотите передать флаг "внутренней" программе (`foo`). Специальный аргумент `--` заставляет программу _прекратить_ обработку флагов и опций (вещей, начинающихся с `-`) в том, что следует, позволяя вам передавать вещи, которые выглядят как флаги, без их интерпретации как таковых: `rm -- -r` или `ssh machine --for-ssh -- foo --for-foo`.
 
 ## Оконные менеджеры
 
@@ -283,26 +273,25 @@ Markdown - это попытка конвертировать в код спос
 можете посмотреть на "сырой" Markdown [здесь](https://raw.githubusercontent.com/missing-semester/missing-semester/master/_2020/potpourri.md).
 
 
-## Hammerspoon (desktop automation on macOS)
+## Hammerspoon (автоматизация рабочего стола на macOS)
 
-[Hammerspoon](https://www.hammerspoon.org/) is a desktop automation framework
-for macOS. It lets you write Lua scripts that hook into operating system
-functionality, allowing you to interact with the keyboard/mouse, windows,
-displays, filesystem, and much more.
+[Hammerspoon](https://www.hammerspoon.org/) является фреймворком для автоматизации рабочего стола
+для macOS. Он позволяет вам писать скрипты на Lua, которые взаимодействуют с операционной системой,
+позволяя вам взаимодействовать с клавиатурой/мышью, окнами,
+дисплеями, файловой системой и многим другим.
 
-Some examples of things you can do with Hammerspoon:
+Некоторые примеры того, что вы можете сделать с Hammerspoon:
 
-- Bind hotkeys to move windows to specific locations
-- Create a menu bar button that automatically lays out windows in a specific layout
-- Mute your speaker when you arrive in lab (by detecting the WiFi network)
-- Show you a warning if you've accidentally taken your friend's power supply
+- Привязать горячие клавиши для перемещения окон в определенные места
+- Создать кнопку в строке меню, которая автоматически располагает окна в определенном виде
+- Отключить звук ваших динамиков, когда вы приходите в лабораторию (через определение Wi-Fi сети)
+- Показать вам предупреждение, если вы случайно взяли блок питания вашего друга
 
-At a high level, Hammerspoon lets you run arbitrary Lua code, bound to menu
-buttons, key presses, or events, and Hammerspoon provides an extensive library
-for interacting with the system, so there's basically no limit to what you can
-do with it. Many people have made their Hammerspoon configurations public, so
-you can generally find what you need by searching the internet, but you can
-always write your own code from scratch.
+Верхнеуровнево, Hammerspoon позволяет вам запускать произвольный код Lua, 
+привязанный к кнопкам меню, нажатиям клавиш или событиям, и Hammerspoon предоставляет обширную библиотеку 
+для взаимодействия с системой, поэтому нет предела тому, что вы можете с ним сделать. 
+Многие люди опубликовали свои конфигурации Hammerspoon, поэтому вы можете найти то, что вам нужно, 
+просто поискав в интернете, но вы всегда можете написать свой собственный код с нуля.
 
 ### Resources
 
@@ -312,64 +301,52 @@ always write your own code from scratch.
 
 ## Booting + Live USBs
 
-When your machine boots up, before the operating system is loaded, the
-[BIOS](https://en.wikipedia.org/wiki/BIOS)/[UEFI](https://en.wikipedia.org/wiki/Unified_Extensible_Firmware_Interface)
-initializes the system. During this process, you can press a specific key
-combination to configure this layer of software. For example, your computer may
-say something like "Press F9 to configure BIOS. Press F12 to enter boot menu."
-during the boot process. You can configure all sorts of hardware-related
-settings in the BIOS menu. You can also enter the boot menu to boot from an
-alternate device instead of your hard drive.
+При включении компьютера, до загрузки операционной системы, 
+[BIOS](https://en.wikipedia.org/wiki/BIOS)/[UEFI](https://en.wikipedia.org/wiki/Unified_Extensible_Firmware_Interface) 
+инициализирует систему. Во время этого процесса вы можете нажать определенную комбинацию клавиш, 
+чтобы настроить это программное обеспечение. Например, ваш компьютер может сказать что-то вроде 
+"Нажмите F9, чтобы настроить BIOS. Нажмите F12, чтобы войти в меню загрузки." 
+во время процесса загрузки. Вы можете конфигурировать все виды настроек, 
+связанные с аппаратным обеспечением, в меню BIOS. Вы также можете войти в меню загрузки, 
+чтобы загрузиться с альтернативного устройства вместо вашего жесткого диска.
 
-[Live USBs](https://en.wikipedia.org/wiki/Live_USB) are USB flash drives
-containing an operating system. You can create one of these by downloading an
-operating system (e.g. a Linux distribution) and burning it to the flash drive.
-This process is a little bit more complicated than simply copying a `.iso` file
-to the disk. There are tools like [UNetbootin](https://unetbootin.github.io/)
-to help you create live USBs.
+[Live USB](https://en.wikipedia.org/wiki/Live_USB) - это USB флеш-накопители, содержащие операционную систему. 
+Вы можете создать один из них, скачав операционную систему (например, дистрибутив Linux) и записав ее на флеш-накопитель. 
+Этот процесс немного сложнее, чем просто копирование файла `.iso` на диск. 
+Существуют инструменты, такие как [UNetbootin](https://unetbootin.github.io/), которые помогают 
+вам создавать Live USB.
 
-Live USBs are useful for all sorts of purposes. Among other things, if you
-break your existing operating system installation so that it no longer boots,
-you can use a live USB to recover data or fix the operating system.
+Live USB полезны для самых разных целей. Среди прочего, если вы сломаете свою существующую операционную систему так, 
+что она больше не загружается, вы можете использовать Live USB для восстановления данных или исправления операционной системы.
 
 ## Docker, Vagrant, VMs, Cloud, OpenStack
 
-[Virtual machines](https://en.wikipedia.org/wiki/Virtual_machine) and similar
-tools like containers let you emulate a whole computer system, including the
-operating system. This can be useful for creating an isolated environment for
-testing, development, or exploration (e.g. running potentially malicious code).
+[Виртуальные машины](https://en.wikipedia.org/wiki/Virtual_machine) и подобные инструменты, 
+такие как контейнеры, позволяют вам эмулировать целую компьютерную систему. 
+Это может быть полезно для создания изолированной среды для тестирования, разработки или исследования 
+(например, запуска потенциально вредоносного кода).
 
-[Vagrant](https://www.vagrantup.com/) is a tool that lets you describe machine
-configurations (operating system, services, packages, etc.) in code, and then
-instantiate VMs with a simple `vagrant up`. [Docker](https://www.docker.com/)
-is conceptually similar but it uses containers instead.
+[Vagrant](https://www.vagrantup.com/) - это инструмент, который позволяет 
+вам описывать конфигурации машин (операционная система, службы, пакеты и т.д.) в коде, 
+а затем создавать виртуальные машины с помощью простой команды `vagrant up`. 
+[Docker](https://www.docker.com/) концептуально похож, но использует контейнеры.
 
-You can also rent virtual machines on the cloud, and it's a nice way to get instant
-access to:
+Вы также можете арендовать виртуальные машины в облаке, и это хороший способ получить мгновенный доступ к:
 
-- A cheap always-on machine that has a public IP address, used to host services
-- A machine with a lot of CPU, disk, RAM, and/or GPU
-- Many more machines than you physically have access to (billing is often by
-the second, so if you want a lot of computing for a short amount of time, it's
-feasible to rent 1000 computers for a couple of minutes)
+- Дешевой и всегда включенной машине с публичным IP-адресом, используемой для хостинга сервисов
+- Машине с большим количеством CPU, диска, RAM и/или GPU
+- Гораздо большему количеству машин, чем у вас есть физический доступ (тарификация часто идет по секундам, поэтому если вам нужно много вычислительной мощности на короткое время, вполне реально арендовать 1000 компьютеров на пару минут)
 
-Popular services include [Amazon AWS](https://aws.amazon.com/), [Google
-Cloud](https://cloud.google.com/),[ Microsoft Azure](https://azure.microsoft.com/),
-[DigitalOcean](https://www.digitalocean.com/).
+Популярные сервисы включают [Amazon AWS](https://aws.amazon.com/), [Google Cloud](https://cloud.google.com/), [Microsoft Azure](https://azure.microsoft.com), [DigitalOcean](https://www.digitalocean.com/).
 
-If you're a member of MIT CSAIL, you can get free VMs for research purposes
-through the [CSAIL OpenStack
-instance](https://tig.csail.mit.edu/shared-computing/open-stack/).
+## Программирование в ноутбуках
 
-## Notebook programming
-
-[Notebook programming
-environments](https://en.wikipedia.org/wiki/Notebook_interface) can be really
-handy for doing certain types of interactive or exploratory development.
-Perhaps the most popular notebook programming environment today is
-[Jupyter](https://jupyter.org/), for Python (and several other languages).
-[Wolfram Mathematica](https://www.wolfram.com/mathematica/) is another notebook
-programming environment that's great for doing math-oriented programming.
+[Среды программирования в ноутбуках](https://en.wikipedia.org/wiki/Notebook_interface) могут быть очень 
+удобны для выполнения определенных типов интерактивной или исследовательской разработки. 
+Возможно, самой популярной средой программирования в ноутбуках сегодня является 
+[Jupyter](https://jupyter.org/), для Python (и нескольких других языков). 
+[Wolfram Mathematica](https://www.wolfram.com/mathematica/) - это еще одна среда программирования в 
+ноутбуках, которая отлично подходит для выполнения программирования, ориентированного на математику.
 
 ## GitHub
 
