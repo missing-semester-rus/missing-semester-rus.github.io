@@ -1,6 +1,6 @@
 ---
 layout: lecture
-title: "Command-line Environment"
+title: "Среда командой строки"
 date: 2020-01-21
 ready: true
 video:
@@ -8,24 +8,23 @@ video:
   id: e8BO_dYxk5c
 ---
 
-In this lecture we will go through several ways in which you can improve your workflow when using the shell. We have been working with the shell for a while now, but we have mainly focused on executing different commands. We will now see how to run several processes at the same time while keeping track of them, how to stop or pause a specific process and how to make a process run in the background.
+В данной лекции мы рассмотрим несколько способов, с помощью которых вы сможете оптимизировать ваш рабочий процесс при использовании командной строки. Мы уже некоторое время работаем с командной строкой, но в основном мы были сфокусированны на исполнении различных команд. Сейчас мы посмотрим на то, как одновременно запускать несколько различных процессов, ведя их учет, как полностью останавливать или приостанавливать определенный процесс и как запускать процесс в фоновом режиме.
 
-We will also learn about different ways to improve your shell and other tools, by defining aliases and configuring them using dotfiles. Both of these can help you save time, e.g. by using the same configurations in all your machines without having to type long commands. We will look at how to work with remote machines using SSH.
+Мы также узнаем о различных способах улучшения вашей командной строки и других инструментов путем определения псевдонимов и их настройки с использованием dotfiles. Оба этих метода могут помочь вам сэкономить время, например, используя те же настройки на всех ваших машинах без необходимости вводить длинные команды. Мы рассмотрим, как работать с удаленными машинами с помощью SSH.
 
+# Контроль задач
 
-# Job Control
+В некоторых случаях вам потребуется прервать задание во время его выполнения, например, если команда слишком долго выполняется (например, `find` с очень большой структурой директорий для поиска).
+В большинстве случаев вы можете выполнить `Ctrl-C`, и команда остановится.
+Но как это на самом деле работает и почему иногда это не удается остановить процесс?
 
-In some cases you will need to interrupt a job while it is executing, for instance if a command is taking too long to complete (such as a `find` with a very large directory structure to search through).
-Most of the time, you can do `Ctrl-C` and the command will stop.
-But how does this actually work and why does it sometimes fail to stop the process?
+## Уничтожение процесса
 
-## Killing a process
+Ваша командная оболочка использует механизм коммуникации UNIX, называемый _сигналом_, для передачи информации процессу. Когда процесс получает сигнал, он останавливает своё выполнение, обрабатывает сигнал и потенциально изменяет поток выполнения на основе информации, которую доставил сигнал. По этой причине сигналы являются _программными прерываниями_.
 
-Your shell is using a UNIX communication mechanism called a _signal_ to communicate information to the process. When a process receives a signal it stops its execution, deals with the signal and potentially changes the flow of execution based on the information that the signal delivered. For this reason, signals are _software interrupts_.
+В нашем случае, когда мы нажимаем `Ctrl-C`, это подает команду оболочке отправить процессу сигнал `SIGINT`.
 
-In our case, when typing `Ctrl-C` this prompts the shell to deliver a `SIGINT` signal to the process.
-
-Here's a minimal example of a Python program that captures `SIGINT` and ignores it, no longer stopping. To kill this program we can now use the `SIGQUIT` signal instead, by typing `Ctrl-\`.
+Вот простой пример программы на Python, которая перехватывает `SIGINT` и игнорирует его, больше не останавливаясь. Чтобы завершить эту программу, теперь нужно использовать сигнал `SIGQUIT`, нажав `Ctrl-\`.
 
 ```python
 #!/usr/bin/env python
@@ -42,7 +41,7 @@ while True:
     i += 1
 ```
 
-Here's what happens if we send `SIGINT` twice to this program, followed by `SIGQUIT`. Note that `^` is how `Ctrl` is displayed when typed in the terminal.
+Вот что произойдет, если мы дважды отправим сигнал `SIGINT` этой программе, а затем отправим `SIGQUIT`. Обратите внимание, что `^` - то, как отображается `Ctrl` при введении в терминале.
 
 ```
 $ python sigint.py
@@ -53,27 +52,27 @@ I got a SIGINT, but I am not stopping
 30^\[1]    39913 quit       python sigint.py
 ```
 
-While `SIGINT` and `SIGQUIT` are both usually associated with terminal related requests, a more generic signal for asking a process to exit gracefully is the `SIGTERM` signal.
-To send this signal we can use the [`kill`](https://www.man7.org/linux/man-pages/man1/kill.1.html) command, with the syntax `kill -TERM <PID>`.
+Хотя `SIGINT` и `SIGQUIT` обычно связаны с запросами, относящимися к терминалу, более общим сигналом, чтобы попросить процесс корректно завершиться, является сигнал `SIGTERM`.
+Для отправки этого сигнала мы можем использовать команду [`kill`](https://www.man7.org/linux/man-pages/man1/kill.1.html) с синтаксисом `kill -TERM <PID>`.
 
-## Pausing and backgrounding processes
+## Приостановка и перевод процесса в фоновый режим
 
-Signals can do other things beyond killing a process. For instance, `SIGSTOP` pauses a process. In the terminal, typing `Ctrl-Z` will prompt the shell to send a `SIGTSTP` signal, short for Terminal Stop (i.e. the terminal's version of `SIGSTOP`).
+Сигналы могут делать и другие вещи, помимо завершения процесса. Например, `SIGSTOP` приостанавливает процесс. Нажатие `Ctrl-Z` в терминале подаст команду оболочке отправить сигнал `SIGTSTP`, что означает Terminal Stop (то есть версия `SIGSTOP` для терминала).
 
-We can then continue the paused job in the foreground or in the background using [`fg`](https://www.man7.org/linux/man-pages/man1/fg.1p.html) or [`bg`](http://man7.org/linux/man-pages/man1/bg.1p.html), respectively.
+Затем мы можем продолжить выполнение задачи в переднем плане или в фоновом режиме, используя [`fg`](https://www.man7.org/linux/man-pages/man1/fg.1p.html) или [`bg`](http://man7.org/linux/man-pages/man1/bg.1p.html), соответственно.
 
-The [`jobs`](https://www.man7.org/linux/man-pages/man1/jobs.1p.html) command lists the unfinished jobs associated with the current terminal session.
-You can refer to those jobs using their pid (you can use [`pgrep`](https://www.man7.org/linux/man-pages/man1/pgrep.1.html) to find that out).
-More intuitively, you can also refer to a process using the percent symbol followed by its job number (displayed by `jobs`). To refer to the last backgrounded job you can use the `$!` special parameter.
+Команда [`jobs`](https://www.man7.org/linux/man-pages/man1/jobs.1p.html) приводит список незавершенных задач, ассоциированных с текущей сессией терминала.
+Вы можете обращаться к этим задачам, используя их pid (вы можете использовать команду [`pgrep`](https://www.man7.org/linux/man-pages/man1/pgrep.1.html), чтобы узнать его).
+Более интуитивно, вы также можете ссылаться на процесс, используя символ процента, за которым следует его номер задачи (отображаемый с помощью `jobs`). Чтобы ссылаться на последнюю задачу, отправленную в фон, вы можете использовать специальный параметр `$!`.
 
-One more thing to know is that the `&` suffix in a command will run the command in the background, giving you the prompt back, although it will still use the shell's STDOUT which can be annoying (use shell redirections in that case).
+Еще одна вещь, которую стоит знать, это то, что суффикс `&` в команде позволит выполнить команду в фоновом режиме, вернув вам контроль командной строки, хотя эта задача все еще будет использовать STDOUT оболочки, что может быть раздражающим факторов (в таких случаях используйте перенаправления вывода).
 
-To background an already running program you can do `Ctrl-Z` followed by `bg`.
-Note that backgrounded processes are still children processes of your terminal and will die if you close the terminal (this will send yet another signal, `SIGHUP`).
-To prevent that from happening you can run the program with [`nohup`](https://www.man7.org/linux/man-pages/man1/nohup.1.html) (a wrapper to ignore `SIGHUP`), or use `disown` if the process has already been started.
-Alternatively, you can use a terminal multiplexer as we will see in the next section.
+Чтобы перевести уже запущенную программу в фоновый режим, можно использовать `Ctrl-Z`, а затем `bg`.
+Обратите внимание, что процессы в фоновом режиме все еще являются дочерними процессами вашего терминала и завершатся, если вы закроете терминал (это отправит еще один сигнал, `SIGHUP`).
+Чтобы этого не произошло, вы можете запустить программу с [`nohup`](https://www.man7.org/linux/man-pages/man1/nohup.1.html) (оболочкой для игнорирования `SIGHUP`) или использовать `disown`, если процесс уже был запущен.
+В качестве альтернативы, вы можете использовать мультиплексор терминалов, как мы увидим в следующем разделе.
 
-Below is a sample session to showcase some of these concepts.
+Ниже приведена примерная сессия, чтобы продемонстрировать некоторые из этих концепций.
 
 ```
 $ sleep 1000
@@ -120,64 +119,65 @@ $ jobs
 
 ```
 
-A special signal is `SIGKILL` since it cannot be captured by the process and it will always terminate it immediately. However, it can have bad side effects such as leaving orphaned children processes.
+Особым сигналом является `SIGKILL`, поскольку его нельзя перехватить внутри процесса, и он всегда немедленно завершит процесс. Использование данного сигнала может приводить к нежелательным эффектам, таким как создание осиротевших дочерних процессов.
 
-You can learn more about these and other signals [here](https://en.wikipedia.org/wiki/Signal_(IPC)) or typing [`man signal`](https://www.man7.org/linux/man-pages/man7/signal.7.html) or `kill -t`.
+Вы можете узнать больше об этих и других сигналах [здесь](https://en.wikipedia.org/wiki/Signal_(IPC)) или введя в терминале [`man signal`](https://www.man7.org/linux/man-pages/man7/signal.7.html) или `kill -l`.
 
 
-# Terminal Multiplexers
+# Терминальный мультиплексор
 
-When using the command line interface you will often want to run more than one thing at once.
-For instance, you might want to run your editor and your program side by side.
-Although this can be achieved by opening new terminal windows, using a terminal multiplexer is a more versatile solution.
+При использовании интефейса командной строки вы часто будете хотеть запустить больше одной задачи одновременно.
+Например, вы можете захотеть запустить ваш редактор и вашу программу одновременно.
+Хоть это и может быть достигнуто путем открытия нового терминального окна, использование терминального мультиплексора является более универсальным решением.
 
-Terminal multiplexers like [`tmux`](https://www.man7.org/linux/man-pages/man1/tmux.1.html) allow you to multiplex terminal windows using panes and tabs so you can interact with multiple shell sessions.
-Moreover, terminal multiplexers let you detach a current terminal session and reattach at some point later in time.
-This can make your workflow much better when working with remote machines since it avoids the need to use `nohup` and similar tricks.
+Терминальные мультиплексоры, такие как [`tmux`](https://www.man7.org/linux/man-pages/man1/tmux.1.html) позволяют вам мультиплексировать окна терминала с помощью панелей и вкладок, чтобы вы могли взаимодействовать сразу с несколькими сессиями оболочки.
+Более того, терминальные мультиплексоры позволяют вам отсоединять текущую сессию терминала и повторно подключаться к ней позднее.
+Это может значительно улучшить ваш рабочий процесс при работе с удаленными машинами, поскольку избавляет от необходимости использовать nohup и подобные трюки.
 
-The most popular terminal multiplexer these days is [`tmux`](https://www.man7.org/linux/man-pages/man1/tmux.1.html). `tmux` is highly configurable and by using the associated keybindings you can create multiple tabs and panes and quickly navigate through them.
+На сегодняшний день самым популярным выбором является [`tmux`](https://www.man7.org/linux/man-pages/man1/tmux.1.html). `tmux` обладает высокой настраиваемостью, и, используя соответствующие комбинации клавиш, вы можете создавать множество вкладок и панелей и быстро перемещаться между ними.
 
-`tmux` expects you to know its keybindings, and they all have the form `<C-b> x` where that means (1) press `Ctrl+b`, (2) release `Ctrl+b`, and then (3) press `x`. `tmux` has the following hierarchy of objects:
-- **Sessions** - a session is an independent workspace with one or more windows
-    + `tmux` starts a new session.
-    + `tmux new -s NAME` starts it with that name.
-    + `tmux ls` lists the current sessions
-    + Within `tmux` typing `<C-b> d`  detaches the current session
-    + `tmux a` attaches the last session. You can use `-t` flag to specify which
+`tmux` ожидает от вас, что вы будете знать его комбинации клавиш. Все комбинации представлены в формате `<C-b> x`, что означает (1) нажать `Ctrl+b`, (2) отпустить `Ctrl+b`, (3) нажать `x`. `tmux` имеет следующую иерархию объектов:
 
-- **Windows** - Equivalent to tabs in editors or browsers, they are visually separate parts of the same session
-    + `<C-b> c` Creates a new window. To close it you can just terminate the shells doing `<C-d>`
-    + `<C-b> N` Go to the _N_ th window. Note they are numbered
-    + `<C-b> p` Goes to the previous window
-    + `<C-b> n` Goes to the next window
-    + `<C-b> ,` Rename the current window
-    + `<C-b> w` List current windows
+- **Сессии** - сессия является независимым рабочим пространством с одним или несколькими окнами.
+    + `tmux` начать новую сессию.
+    + `tmux new -s NAME` начать сессию с именем `NAME`.
+    + `tmux ls` вывести список текущих сессий.
+    + В `tmux`, нажатие `<C-b> d` отсоединяет текущую сессию.
+    + `tmux a` присоединиться к последней сессии. Вы можете использовать флаг `-t` для указания конкретной сессии.
 
-- **Panes** - Like vim splits, panes let you have multiple shells in the same visual display.
-    + `<C-b> "` Split the current pane horizontally
-    + `<C-b> %` Split the current pane vertically
-    + `<C-b> <direction>` Move to the pane in the specified _direction_. Direction here means arrow keys.
-    + `<C-b> z` Toggle zoom for the current pane
-    + `<C-b> [` Start scrollback. You can then press `<space>` to start a selection and `<enter>` to copy that selection.
-    + `<C-b> <space>` Cycle through pane arrangements.
+- **Окна** - Аналогично вкладкам в редакторах или браузерах, это визуально отдельные части одной и той же сессии.
+    + `<C-b> c` Создание нового окна. Для закрытия вам достаточно закрыть оболочку, используя `<C-d>`.
+    + `<C-b> N` перейти к окну под номером _N_. Обратите внимание, что окна пронумерованы.
+    + `<C-b> p` Перейти к предыдущему окну.
+    + `<C-b> n` Перейти к следующему окну.
+    + `<C-b> ,` Переименовать текущее окно.
+    + `<C-b> w` Вывести список всех окон.
 
-For further reading,
-[here](https://www.hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/) is a quick tutorial on `tmux` and [this](http://linuxcommand.org/lc3_adv_termmux.php) has a more detailed explanation that covers the original `screen` command. You might also want to familiarize yourself with [`screen`](https://www.man7.org/linux/man-pages/man1/screen.1.html), since it comes installed in most UNIX systems.
+- **Панели** - Подобно разделениям в vim, панели позволяют иметь несколько оболочек в одном визуальном отображении.
+    + `<C-b> "` Разделить текущую панель на 2 горизонтально.
+    + `<C-b> %` Разделить текущую панель на 2 вертикально.
+    + `<C-b> <direction>` Перейти к другой панели в направлении _direction_. Здесь направление означает стрелку.
+    + `<C-b> z` Переключиться на текущую панель.
+    + `<C-b> [` Начать прокрутку назад. Затем вы можете нажать `<space>`, чтобы начать выделение, и `<enter>`, чтобы скопировать выделенный текст.
+    + `<C-b> <space>` Переключаться между расположениями панелей.
 
-# Aliases
+Для дальнейшего чтения:
+[здесь](https://www.hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/) короткий туториал по `tmux` и [здесь](http://linuxcommand.org/lc3_adv_termmux.php) более детальный рассказ, который затрагивает оригинальную команду `screen`. Возможно вы также захотите познакомиться с командой [`screen`](https://www.man7.org/linux/man-pages/man1/screen.1.html), так как она является предустановленной в большинстве UNIX систем.
 
-It can become tiresome typing long commands that involve many flags or verbose options.
-For this reason, most shells support _aliasing_.
-A shell alias is a short form for another command that your shell will replace automatically for you.
-For instance, an alias in bash has the following structure:
+# Псевдонимы
+
+Ввод длинных команд может быть утомительным, включающие множество флагов или подробных опций.
+По этой причине большинство оболочек поддерживает _создание псевдонимов_ (_aliasing_).
+Псевдоним (Alias) в оболочке — это краткая форма для другой команды, которую ваша оболочка автоматически заменит для вас.
+Например, псевдоним в bash имеет следующую структуру:
 
 ```bash
 alias alias_name="command_to_alias arg1 arg2"
 ```
 
-Note that there is no space around the equal sign `=`, because [`alias`](https://www.man7.org/linux/man-pages/man1/alias.1p.html) is a shell command that takes a single argument.
+Заметьте, что вокруг знака `=` нет пробелов, т.к. [`alias`](https://www.man7.org/linux/man-pages/man1/alias.1p.html) является командой оболочки, принимающий один аргумент.
 
-Aliases have many convenient features:
+Псевдонимы имеют много удобных свойств
 
 ```bash
 # Make shorthands for common flags
@@ -210,71 +210,60 @@ alias ll
 # Will print ll='ls -lh'
 ```
 
-Note that aliases do not persist shell sessions by default.
-To make an alias persistent you need to include it in shell startup files, like `.bashrc` or `.zshrc`, which we are going to introduce in the next section.
+Обратите внимание, что псевдонимы по умолчанию не сохраняются между сессиями оболочки.
+Чтобы сделать псевдоним постоянным, вам нужно включить его в файлы запуска оболочки, такие как `.bashrc` или `.zshrc`, которые мы представим в следующем разделе.
 
 
 # Dotfiles
 
-Many programs are configured using plain-text files known as _dotfiles_
-(because the file names begin with a `.`, e.g. `~/.vimrc`, so that they are
-hidden in the directory listing `ls` by default).
+Многие программы сконфигурированы с помощью обычных текстовых файлов, которые называются _dotfiles_ (они названы так, потому что имена файлов начинаются с `.`, например `~/.vimrc`, таким образом они по умолчанию скрыты в списке файлов `ls`).
 
-Shells are one example of programs configured with such files. On startup, your shell will read many files to load its configuration.
-Depending on the shell, whether you are starting a login and/or interactive the entire process can be quite complex.
-[Here](https://blog.flowblok.id.au/2013-02/shell-startup-scripts.html) is an excellent resource on the topic.
+Терминал является одним из примеров программы, которая конфигурируется с использованием таких файлов. При запуске ваш терминал прочитает множество файлов, чтобы загрузить свои конфигурации.
+В зависимости от терминала, независимо от того, входите ли вы в систему и/или интерактивный режим, весь процесс может быть довольно сложным.
+[Здесь](https://blog.flowblok.id.au/2013-02/shell-startup-scripts.html) можно найти много информации на данную тему.
 
-For `bash`, editing your `.bashrc` or `.bash_profile` will work in most systems.
-Here you can include commands that you want to run on startup, like the alias we just described or modifications to your `PATH` environment variable.
-In fact, many programs will ask you to include a line like `export PATH="$PATH:/path/to/program/bin"` in your shell configuration file so their binaries can be found.
+Для `bash` редактирование `.bashrc` или `.bash_profile` будет работать в большинстве систем.
+Здесь вы можете объявлять команды, которые будут запущены при старте, например, определять псевдонимы или модифицировать переменную окружения `PATH`.
+На самом деле многие программы будут просить вас включить такую строчку `export PATH="$PATH:/path/to/program/bin"` в конфигурационный файл вашего терминала, чтобы терминал мог найти бинарные файлы программ.
 
-Some other examples of tools that can be configured through dotfiles are:
+Некоторые другие примеры инструментов, которые могут быть сконфигурированы с помощью dotfiles:
 
 - `bash` - `~/.bashrc`, `~/.bash_profile`
 - `git` - `~/.gitconfig`
-- `vim` - `~/.vimrc` and the `~/.vim` folder
+- `vim` - `~/.vimrc` и папка `~/.vim`
 - `ssh` - `~/.ssh/config`
 - `tmux` - `~/.tmux.conf`
 
-How should you organize your dotfiles? They should be in their own folder,
-under version control, and **symlinked** into place using a script. This has
-the benefits of:
+Как следует организовывать ваши dotfiles? Они должны находиться в своей собственной папке, под контролем версий, и **ссылаться с помощью символических ссылок** на места их использования с помощью скрипта. Это имеет следующие преимущества:
 
-- **Easy installation**: if you log in to a new machine, applying your
-customizations will only take a minute.
-- **Portability**: your tools will work the same way everywhere.
-- **Synchronization**: you can update your dotfiles anywhere and keep them all
-in sync.
-- **Change tracking**: you're probably going to be maintaining your dotfiles
-for your entire programming career, and version history is nice to have for
-long-lived projects.
+- **Простота установки**: если вы входите в новую машину, применение ваших
+персональных настроек займет лишь минуту.
+- **Переносимость**: ваши инструменты будут работать одинаковым образом везде.
+- **Синхронизация**: вы можете обновлять ваши dotfiles где угодно и держать их 
+синхронизированными.
+- **Отслеживание изменений**: вероятно, вы будете поддерживать свои dotfiles 
+на протяжении всей своей карьеры, и история версий полезна для долгосрочных проектов.
 
-What should you put in your dotfiles?
-You can learn about your tool's settings by reading online documentation or
-[man pages](https://en.wikipedia.org/wiki/Man_page). Another great way is to
-search the internet for blog posts about specific programs, where authors will
-tell you about their preferred customizations. Yet another way to learn about
-customizations is to look through other people's dotfiles: you can find tons of
-[dotfiles
-repositories](https://github.com/search?o=desc&q=dotfiles&s=stars&type=Repositories)
-on Github --- see the most popular one
-[here](https://github.com/mathiasbynens/dotfiles) (we advise you not to blindly
-copy configurations though).
-[Here](https://dotfiles.github.io/) is another good resource on the topic.
+Что следует включать в ваши dotfiles?
 
-All of the class instructors have their dotfiles publicly accessible on GitHub: [Anish](https://github.com/anishathalye/dotfiles),
+Вы можете узнать о настройках контретного инструмента, прочитав онлайн документацию или
+[man страницу](https://en.wikipedia.org/wiki/Man_page). Ещё один отличный способ - 
+поиск в интернете блог-постов о конкретных программах, где авторы расскажут вам 
+о своих предпочтительных настройках. Ещё один способ узнать о настройках — это просмотреть dotfiles других людей: вы можете найти множество [dotfiles репозиториев](https://github.com/search?o=desc&q=dotfiles&s=stars&type=Repositories) на Github --- ищите самые популярные [здесь](https://github.com/mathiasbynens/dotfiles) (хотя мы не советуем слепо копировать все конфигурации).
+[Здесб](https://dotfiles.github.io/) еще один отличный ресурс на эту тему.
+
+Все инструкторы курса имеют свои dotfiles в открытом доступе на GitHub: [Anish](https://github.com/anishathalye/dotfiles),
 [Jon](https://github.com/jonhoo/configs),
 [Jose](https://github.com/jjgo/dotfiles).
 
 
-## Portability
+## Переносимость
 
-A common pain with dotfiles is that the configurations might not work when working with several machines, e.g. if they have different operating systems or shells. Sometimes you also want some configuration to be applied only in a given machine.
+Общей проблемой с dotfiles является то, что конфигурации могут не работать при использовании нескольких машин, например, если они имеют разные операционные системы или оболочки. Иногда вы также хотите, чтобы некоторые настройки применялись только на данной машине.
 
-There are some tricks for making this easier.
-If the configuration file supports it, use the equivalent of if-statements to
-apply machine specific customizations. For example, your shell could have something
-like:
+Есть несколько способов, чтобы сделать это проще.
+Если файл конфигурации это поддерживает, используйте эквиваленты оператора if для того, чтобы применять настройки, специфичные для конкретной машины. Например, ваша оболочка может
+содержать что-то вроде:
 
 ```bash
 if [[ "$(uname)" == "Linux" ]]; then {do_something}; fi
@@ -286,19 +275,18 @@ if [[ "$SHELL" == "zsh" ]]; then {do_something}; fi
 if [[ "$(hostname)" == "myServer" ]]; then {do_something}; fi
 ```
 
-If the configuration file supports it, make use of includes. For example,
-a `~/.gitconfig` can have a setting:
+Если файл конфигурации это поддерживает, используйте include. Например
+`~/.gitconfig` может содержать:
 
 ```
 [include]
     path = ~/.gitconfig_local
 ```
 
-And then on each machine, `~/.gitconfig_local` can contain machine-specific
-settings. You could even track these in a separate repository for
-machine-specific settings.
+Затем на каждой машине `~/.gitconfig_local` может содержать специфичные
+настройки. YВы даже можете отслеживать эти настройки в отдельном репозитории для настроек, специфичных для каждой машины.
 
-This idea is also useful if you want different programs to share some configurations. For instance, if you want both `bash` and `zsh` to share the same set of aliases you can write them under `.aliases` and have the following block in both:
+Эта идея также полезна, если вы хотите, чтобы разные программы использовали некоторые общие настройки. Например, если вы хотите, чтобы `bash` и `zsh` использовали один и тот же набор псевдонимов, вы можете записать их в `.aliases` и добавить следующий блок в обе оболочки:
 
 ```bash
 # Test if ~/.aliases exists and source it
@@ -307,86 +295,87 @@ if [ -f ~/.aliases ]; then
 fi
 ```
 
-# Remote Machines
+# Удаленные машины
 
-It has become more and more common for programmers to use remote servers in their everyday work. If you need to use remote servers in order to deploy backend software or you need a server with higher computational capabilities, you will end up using a Secure Shell (SSH). As with most tools covered, SSH is highly configurable so it is worth learning about it.
+Стало всё более обычным для программистов использовать удалённые серверы в своей повседневной работе. Если вам нужно использовать удалённые серверы для развертывания серверного программного обеспечения или вам нужен сервер с более высокими вычислительными возможностями, в итоге вы будете использовать Secure Shell (SSH). Как и в случае с большинством рассматриваемых инструментов, SSH имеет высокую степень настраиваемости, поэтому стоит изучить его.
 
-To `ssh` into a server you execute a command as follows
+Для подключения `ssh` к серверу вы выполняете следующую команду:
 
 ```bash
 ssh foo@bar.mit.edu
 ```
 
-Here we are trying to ssh as user `foo` in server `bar.mit.edu`.
-The server can be specified with a URL (like `bar.mit.edu`) or an IP (something like `foobar@192.168.1.42`). Later we will see that if we modify ssh config file you can access just using something like `ssh bar`.
+Здесь мы пытаемся подключиться по ssh как пользователь `foo` к серверу `bar.mit.edu`.
+Сервер может быть указан как URL (`bar.mit.edu`) или IP (например `foobar@192.168.1.42`). Далее мы
+увидим, что если мы модифицируем конфигурационный файл ssh, можно будет подключаться просто используя `ssh bar`.
 
-## Executing commands
+## Исполнение команд
 
-An often overlooked feature of `ssh` is the ability to run commands directly.
-`ssh foobar@server ls` will execute `ls` in the home folder of foobar.
-It works with pipes, so `ssh foobar@server ls | grep PATTERN` will grep locally the remote output of `ls` and `ls | ssh foobar@server grep PATTERN` will grep remotely the local output of `ls`.
+Часто упускаемой из виду особенностью `ssh` является возможность непосредственного выполнения команд.
+`ssh foobar@server ls` выполнит `ls` в домашней папке foobar.
+Это работает с использованием каналов, так что `ssh foobar@server ls | grep PATTERN` будет локально применять grep к удалённому выводу `ls`, а `ls | ssh foobar@server grep PATTERN` будет применять grep на удалённом сервере к локальному выводу `ls`.
 
 
-## SSH Keys
+## SSH ключи
 
-Key-based authentication exploits public-key cryptography to prove to the server that the client owns the secret private key without revealing the key. This way you do not need to reenter your password every time. Nevertheless, the private key (often `~/.ssh/id_rsa` and more recently `~/.ssh/id_ed25519`) is effectively your password, so treat it like so.
+Аутентификация на основе ключей использует криптографию с открытым ключом, чтобы доказать серверу, что клиент владеет секретным закрытым ключом, не раскрывая сам ключ. Таким образом, вам не нужно каждый раз вводить свой пароль. Тем не менее, закрытый ключ (часто `~/.ssh/id_rsa` или `~/.ssh/id_ed25519`) фактически является вашим паролем, поэтому относитесь к нему соответствующе.
 
-### Key generation
+### Генерация ключей
 
-To generate a pair you can run [`ssh-keygen`](https://www.man7.org/linux/man-pages/man1/ssh-keygen.1.html).
+Для генерации пары ключей вы можете выполнить [`ssh-keygen`](https://www.man7.org/linux/man-pages/man1/ssh-keygen.1.html).
 ```bash
 ssh-keygen -o -a 100 -t ed25519 -f ~/.ssh/id_ed25519
 ```
-You should choose a passphrase, to avoid someone who gets hold of your private key to access authorized servers. Use [`ssh-agent`](https://www.man7.org/linux/man-pages/man1/ssh-agent.1.html) or [`gpg-agent`](https://linux.die.net/man/1/gpg-agent) so you do not have to type your passphrase every time.
+Вам следует выбрать passphrase (фраза-пароль), чтобы избежать доступа к авторизованным серверам тех, кто получит ваш приватный ключ. Используйте [`ssh-agent`](https://www.man7.org/linux/man-pages/man1/ssh-agent.1.html) или [`gpg-agent`](https://linux.die.net/man/1/gpg-agent), чтобы вам не приходилось каждый раз вводить ваш passphrase.
 
-If you have ever configured pushing to GitHub using SSH keys, then you have probably done the steps outlined [here](https://help.github.com/articles/connecting-to-github-with-ssh/) and have a valid key pair already. To check if you have a passphrase and validate it you can run `ssh-keygen -y -f /path/to/key`.
+Если вы когда-либо настраивали push функциональность на GitHub с использованием SSH-ключей, то, вероятно, вы уже выполнили шаги, описанные [здесь](https://help.github.com/articles/connecting-to-github-with-ssh/), и у вас уже есть действующая пара ключей. Чтобы проверить, есть ли у вас passphrase и проверить её, вы можете выполнить `ssh-keygen -y -f /path/to/key`.
 
-### Key based authentication
+### Аутентификация на основе ключа
 
-`ssh` will look into `.ssh/authorized_keys` to determine which clients it should let in. To copy a public key over you can use:
+`ssh` посмотрим `.ssh/authorized_keys`, чтобы определить, каких клиентов следует пропустить. Чтобы скопировать публичный ключ, вы можете использовать::
 
 ```bash
 cat .ssh/id_ed25519.pub | ssh foobar@remote 'cat >> ~/.ssh/authorized_keys'
 ```
 
-A simpler solution can be achieved with `ssh-copy-id` where available:
+Более простое решение - использование `ssh-copy-id`:
 
 ```bash
 ssh-copy-id -i .ssh/id_ed25519.pub foobar@remote
 ```
 
-## Copying files over SSH
+## Копирование файлов через SSH
 
-There are many ways to copy files over ssh:
+Есть много способов копировать файлы через SSH:
 
-- `ssh+tee`, the simplest is to use `ssh` command execution and STDIN input by doing `cat localfile | ssh remote_server tee serverfile`. Recall that [`tee`](https://www.man7.org/linux/man-pages/man1/tee.1.html) writes the output from STDIN into a file.
-- [`scp`](https://www.man7.org/linux/man-pages/man1/scp.1.html) when copying large amounts of files/directories, the secure copy `scp` command is more convenient since it can easily recurse over paths. The syntax is `scp path/to/local_file remote_host:path/to/remote_file`
-- [`rsync`](https://www.man7.org/linux/man-pages/man1/rsync.1.html) improves upon `scp` by detecting identical files in local and remote, and preventing copying them again. It also provides more fine grained control over symlinks, permissions and has extra features like the `--partial` flag that can resume from a previously interrupted copy. `rsync` has a similar syntax to `scp`.
+- `ssh+tee`, самый простой способ - выполнение команды `ssh` и ввод STDIN, используя `cat localfile | ssh remote_server tee serverfile`. Напомним, что [`tee`](https://www.man7.org/linux/man-pages/man1/tee.1.html) пишеь вывод из STDIN в файл.
+- [`scp`](https://www.man7.org/linux/man-pages/man1/scp.1.html) при копировании большого количества файлов/директорий, команда безопасного копирования (secure copy) `scp` более удобна, т.к. она рекурсивно обрабатывает пути. Синтаксис следующий: `scp path/to/local_file remote_host:path/to/remote_file`
+- [`rsync`](https://www.man7.org/linux/man-pages/man1/rsync.1.html) улучшение `scp` путем обнаружения одинаковых файлов локально и на удаленной машине, для того, чтобы не копировать их лишний раз. Также команда предоставляет более детальный контроль над символическими ссылками, доступами и имеет дополнительную функциональность, например флаг `--partial` который восстанавливает работу после предудущего прерванного копирования. `rsync` имеет такой же синтаксис, как и `scp`.
 
-## Port Forwarding
+## Перенаправление портов
 
-In many scenarios you will run into software that listens to specific ports in the machine. When this happens in your local machine you can type `localhost:PORT` or `127.0.0.1:PORT`, but what do you do with a remote server that does not have its ports directly available through the network/internet?.
+Во многих сценариях вы столкнетесь с программным обеспечением, которое слушает определенные порты на машине. Когда это происходит на вашем локальном компьютере, вы можете ввести `localhost:PORT` или `127.0.0.1:PORT`, но что делать, если программа запущена на удаленном сервере и у вас нет доступа к `localhost` удаленной машины через сеть/интернет?
 
-This is called _port forwarding_ and it
-comes in two flavors: Local Port Forwarding and Remote Port Forwarding (see the pictures for more details, credit of the pictures from [this StackOverflow post](https://unix.stackexchange.com/questions/115897/whats-ssh-port-forwarding-and-whats-the-difference-between-ssh-local-and-remot)).
+Это называется _перенаправлением портов_ (_port forwarding_) и
+бывает двух видов: Локальное перенаправление портов и Удаленное перенаправление портов (посмотрите на изображение для подробностей, авторство картинки принадлежит [этому посту на StackOverflow](https://unix.stackexchange.com/questions/115897/whats-ssh-port-forwarding-and-whats-the-difference-between-ssh-local-and-remot)).
 
-**Local Port Forwarding**
-![Local Port Forwarding](https://i.stack.imgur.com/a28N8.png  "Local Port Forwarding")
+**Локальное перенаправление портов**
+![Локальное перенаправление портов](https://i.stack.imgur.com/a28N8.png  "Локальное перенаправление портов")
 
-**Remote Port Forwarding**
-![Remote Port Forwarding](https://i.stack.imgur.com/4iK3b.png  "Remote Port Forwarding")
+**Удаленное перенаправление портов**
+![Удаленное перенаправление портов](https://i.stack.imgur.com/4iK3b.png  "Удаленное перенаправление портов")
 
-The most common scenario is local port forwarding, where a service in the remote machine listens in a port and you want to link a port in your local machine to forward to the remote port. For example, if we execute  `jupyter notebook` in the remote server that listens to the port `8888`. Thus, to forward that to the local port `9999`, we would do `ssh -L 9999:localhost:8888 foobar@remote_server` and then navigate to `locahost:9999` in our local machine.
+Самый распространенный сценарий — это локальное перенаправление портов, когда сервис на удаленной машине слушает порт, и вы хотите связать порт на вашем локальном компьютере с удаленным портом. Например, мы выполняем `jupyter notebook` на удаленном сервере, который слушает порт `8888`. Для перенаправления его на локальный порт `9999`, мы бы сделали `ssh -L 9999:localhost:8888 foobar@remote_server` и затем перешли бы на `localhost:9999` на нашем локальном компьютере.
 
 
-## SSH Configuration
+## Конфигурация SSH
 
-We have covered many many arguments that we can pass. A tempting alternative is to create shell aliases that look like
+Мы рассмотрели большое количество передаваемых аргументов.  Соблазнительной альтернативой является создание псевдонимов в оболочке, которые выглядят следующим образом
 ```bash
 alias my_server="ssh -i ~/.id_ed25519 --port 2222 -L 9999:localhost:8888 foobar@remote_server
 ```
 
-However, there is a better alternative using `~/.ssh/config`.
+Однако есть лучшая альтернатива - `~/.ssh/config`.
 
 ```bash
 Host vm
@@ -401,99 +390,98 @@ Host *.mit.edu
     User foobaz
 ```
 
-An additional advantage of using the `~/.ssh/config` file over aliases  is that other programs like `scp`, `rsync`, `mosh`, &c are able to read it as well and convert the settings into the corresponding flags.
+Дополнительным преимуществом использования файла `~/.ssh/config` вместо псевдонимов заключается в том, что другие программы (например `scp`, `rsync`, `mosh` и т.д.) могут также читать эти конфигурации и конвертировать их в подходящие для себя флаги.
 
 
-Note that the `~/.ssh/config` file can be considered a dotfile, and in general it is fine for it to be included with the rest of your dotfiles. However, if you make it public, think about the information that you are potentially providing strangers on the internet: addresses of your servers, users, open ports, &c. This may facilitate some types of attacks so be thoughtful about sharing your SSH configuration.
+Обратите внимание, что файл `~/.ssh/config` можно считать dotfile, и в общем случае его можно включать вместе с остальными вашими dotfiles. Однако, если вы делаете его публичным, подумайте о той информации, которую вы потенциально предоставляете незнакомцам в интернете: адреса ваших серверов, пользователи, открытые порты и т. д. Это может облегчить некоторые виды атак, поэтому будьте внимательны, делая общедоступной вашу конфигурацию SSH.
 
-Server side configuration is usually specified in `/etc/ssh/sshd_config`. Here you can make changes like disabling password authentication, changing ssh ports, enabling X11 forwarding, &c. You can specify config settings on a per user basis.
+Серверные конфигурации указываются в `/etc/ssh/sshd_config`. Здесь вы можете вносить изменения, такие как отключение аутентификации по паролю, изменение портов ssh, включение перенаправления X11 и т. д. Вы можете указывать настройки конфигурации для каждого пользователя отдельно.
 
-## Miscellaneous
+## Разное
 
-A common pain when connecting to a remote server are disconnections due to shutting down/sleeping your computer or changing a network. Moreover if one has a connection with significant lag using ssh can become quite frustrating. [Mosh](https://mosh.org/), the mobile shell, improves upon ssh, allowing roaming connections, intermittent connectivity and providing intelligent local echo.
+Общей проблемой при подключении к удаленному серверу являются отключения из-за выключения/перевода в спящий режим компьютера или смены сети. Более того, если у кого-то есть соединение с задержкой, использование ssh может стать затруднительным. [Mosh](https://mosh.org/) - мобильная оболочка, которая улучшает ssh, позволяя подключения с роумингом, обрывание соединений и предоставляет интеллектуальный локальный эхо-ответ.
 
-Sometimes it is convenient to mount a remote folder. [sshfs](https://github.com/libfuse/sshfs) can mount a folder on a remote server
-locally, and then you can use a local editor.
+Иногда бывает удобно примонтировать удаленную папку. [sshfs](https://github.com/libfuse/sshfs) позволяет монтировать папку на удаленном сервере локально,
+и затем вы можете использовать локальный редактор.
 
 
-# Shells & Frameworks
+# Оболочки & Фреймворки
 
-During shell tool and scripting we covered the `bash` shell because it is by far the most ubiquitous shell and most systems have it as the default option. Nevertheless, it is not the only option.
+Во время работы с инструментами оболочки и скриптинга мы рассматривали оболочку `bash`, поскольку она наиболее распространена и в большинстве систем установлена по умолчанию. Тем не менее, это не единственный вариант.
 
-For example, the `zsh` shell is a superset of `bash` and provides many convenient features out of the box such as:
+Например, оболочка `zsh` является надмножеством bash и предлагает множество удобных функций "из коробки", таких как:
 
-- Smarter globbing, `**`
-- Inline globbing/wildcard expansion
-- Spelling correction
-- Better tab completion/selection
-- Path expansion (`cd /u/lo/b` will expand as `/usr/local/bin`)
+- Умнее работа с глобами, `**`
+- Инлайн-расширение глобов/шаблонов
+- Коррекция орфографии
+- Лучшее автодополнение
+- Расщирение путей (`cd /u/lo/b` будет расширено до `/usr/local/bin`)
 
-**Frameworks** can improve your shell as well. Some popular general frameworks are [prezto](https://github.com/sorin-ionescu/prezto) or [oh-my-zsh](https://ohmyz.sh/), and smaller ones that focus on specific features such as [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) or [zsh-history-substring-search](https://github.com/zsh-users/zsh-history-substring-search). Shells like [fish](https://fishshell.com/) include many of these user-friendly features by default. Some of these features include:
+**Фреймворки** также могут улучшить вашу оболочку. Некоторые из популярных фреймвоков: [prezto](https://github.com/sorin-ionescu/prezto) или [oh-my-zsh](https://ohmyz.sh/), также есть меньшие фреймворки, которые специфицируются на отдельных функциях, например [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) или [zsh-history-substring-search](https://github.com/zsh-users/zsh-history-substring-search). Оболочки вроде [fish](https://fishshell.com/) iизначально включают множество этих удобных для пользователя функций. К некоторым из этих функций относятся:
 
-- Right prompt
-- Command syntax highlighting
-- History substring search
-- manpage based flag completions
-- Smarter autocompletion
-- Prompt themes
+- Правильные prompt
+- Подсветка синтаксиса команд
+- Поиск по подстроке в истории
+- Автодополнение флагов на основе man-страниц
+- Умное автодополнение
+- Prompt темы
 
-One thing to note when using these frameworks is that they may slow down your shell, especially if the code they run is not properly optimized or it is too much code. You can always profile it and disable the features that you do not use often or value over speed.
+Одно из важных замечаний при использовании этих фреймворков заключается в том, что они могут замедлить вашу оболочку, особенно если код, который они выполняют, не оптимизирован должным образом или его слишком много. Вы всегда можете профилировать его и отключать функции, которые вы используете нечасто или которые вы не цените выше скорости.
 
-# Terminal Emulators
+# Эмуляторы терминала
 
-Along with customizing your shell, it is worth spending some time figuring out your choice of **terminal emulator** and its settings. There are many many terminal emulators out there (here is a [comparison](https://anarc.at/blog/2018-04-12-terminal-emulators-1/)).
+Вместе с настройкой вашей оболочки, стоит потратить некоторое время на выбор **терминального эмулятора** и его настроек. Существует множество терминальных эмуляторов (вот [сравнение](https://anarc.at/blog/2018-04-12-terminal-emulators-1/)).
 
-Since you might be spending hundreds to thousands of hours in your terminal it pays off to look into its settings. Some of the aspects that you may want to modify in your terminal include:
+Поскольку вы можете провести сотни или тысячи часов в терминале, стоит обратить внимание на его настройки. Некоторые из аспектов, которые вы можете захотеть изменить в вашем терминале, включают:
 
-- Font choice
-- Color Scheme
-- Keyboard shortcuts
-- Tab/Pane support
-- Scrollback configuration
-- Performance (some newer terminals like [Alacritty](https://github.com/jwilm/alacritty) or [kitty](https://sw.kovidgoyal.net/kitty/) offer GPU acceleration).
+- Выбор шрифта
+- Цветовая схема
+- Клавишные комбинации
+- Поддержка вкладок/панелей
+- Конфигурация прокрутки
+- Производительность (некоторые новые терминалы, например [Alacritty](https://github.com/jwilm/alacritty) или [kitty](https://sw.kovidgoyal.net/kitty/) предлагают ускорение за счет использования GPU).
 
-# Exercises
+# Упражения
 
-## Job control
+## Контроль задач
 
-1. From what we have seen, we can use some `ps aux | grep` commands to get our jobs' pids and then kill them, but there are better ways to do it. Start a `sleep 10000` job in a terminal, background it with `Ctrl-Z` and continue its execution with `bg`. Now use [`pgrep`](https://www.man7.org/linux/man-pages/man1/pgrep.1.html) to find its pid and [`pkill`](http://man7.org/linux/man-pages/man1/pgrep.1.html) to kill it without ever typing the pid itself. (Hint: use the `-af` flags).
+1. Из того, что мы увидели, мы можем использовать команды вида `ps aux | grep`, чтобы получить pid интересующих задач, чтобы затем остановить их, но есть более предпочтительные способы сделать это. Начните команду `sleep 10000` в терминале, приостановите ее с помощью `Ctrl-Z` и затем возобновите выполнение в фоновом режиме с помощью `bg`. Теперь используйте [`pgrep`](https://www.man7.org/linux/man-pages/man1/pgrep.1.html), чтобы найти pid задачи и затем [`pkill`](http://man7.org/linux/man-pages/man1/pkill.1.html), чтобы остановить задачу без использования самого pid (Подсказка: используйте флаги `-af`).
 
-1. Say you don't want to start a process until another completes, how you would go about it? In this exercise our limiting process will always be `sleep 60 &`.
-One way to achieve this is to use the [`wait`](https://www.man7.org/linux/man-pages/man1/wait.1p.html) command. Try launching the sleep command and having an `ls` wait until the background process finishes.
+2. Скажем, вы не хотите начинать новый процесс, пока что другой не завершился, что бы вы сделали на этот счет? В данном упражнении ограничивающий нас процесс всегда будет `sleep 60 &`.
+Один из способов достигнуть этого - использовать команду [`wait`](https://www.man7.org/linux/man-pages/man1/wait.1p.html). Попробуйте запустить команду `sleep` и пусть команда `ls` ждет, пока фоновый процесс завершится 
 
-    However, this strategy will fail if we start in a different bash session, since `wait` only works for child processes. One feature we did not discuss in the notes is that the `kill` command's exit status will be zero on success and nonzero otherwise. `kill -0` does not send a signal but will give a nonzero exit status if the process does not exist.
-    Write a bash function called `pidwait` that takes a pid and waits until the given process completes. You should use `sleep` to avoid wasting CPU unnecessarily.
+    Однако такая стратегия провалится если мы попробуем выполнить команду в другой bash сессии, так как `wait` будет работать только для дочерних процессов. Одна возможность, которую мы не обсудили - команда `kill` будет иметь нулевой статус в случае успеха и ненулевой в обратном случае. `kill -0` не посылает никакого сигнала, а просто возвращает ненулевой статус, если процесса не существует.
+    Напишите bash функцию `pidwait`, которая берет pid и ждет, пока процесс не завершится. Вам следует использовать `sleep`, чтобы избежать расходования ресурсов CPU.
 
-## Terminal multiplexer
+## Терминальный мультиплексор
 
-1. Follow this `tmux` [tutorial](https://www.hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/) and then learn how to do some basic customizations following [these steps](https://www.hamvocke.com/blog/a-guide-to-customizing-your-tmux-conf/).
+1. Следуйте `tmux` [туториалу](https://www.hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/) и затем узнайте как делать базовые кастомизации с помощью [этого туториала](https://www.hamvocke.com/blog/a-guide-to-customizing-your-tmux-conf/).
 
-## Aliases
+## Псевдонимы
 
-1. Create an alias `dc` that resolves to `cd` for when you type it wrongly.
+1. Создайте псевдоним `dc` который вызывает `cd` (для случая, когда вы сделали ошибку при печати `cd`).
 
-1.  Run `history | awk '{$1="";print substr($0,2)}' | sort | uniq -c | sort -n | tail -n 10`  to get your top 10 most used commands and consider writing shorter aliases for them. Note: this works for Bash; if you're using ZSH, use `history 1` instead of just `history`.
+2. Запустите `history | awk '{$1="";print substr($0,2)}' | sort | uniq -c | sort -n | tail -n 10`, чтобы получить top 10 самых используемых команд и подумайте над тем, чтобы сделать псевдонимы для них. Замечание: это работает для `bash`; если используете `zsh`, введите `history 1` вместо `history`.
 
 
 ## Dotfiles
 
-Let's get you up to speed with dotfiles.
-1. Create a folder for your dotfiles and set up version
-   control.
-1. Add a configuration for at least one program, e.g. your shell, with some
-   customization (to start off, it can be something as simple as customizing your shell prompt by setting `$PS1`).
-1. Set up a method to install your dotfiles quickly (and without manual effort) on a new machine. This can be as simple as a shell script that calls `ln -s` for each file, or you could use a [specialized
-   utility](https://dotfiles.github.io/utilities/).
-1. Test your installation script on a fresh virtual machine.
-1. Migrate all of your current tool configurations to your dotfiles repository.
-1. Publish your dotfiles on GitHub.
+Давайте введем вас в курс дела с dotfiles.
+1. Создайте папку для ваших dotfiles и настройте
+   контроль версий.
+2. Добавьте конфигурацию для как минимум одной программы, например вашей оболочки с некоторыми персональными 
+   настройками (tдля начала это может быть что-то такое простое, как настройка приглашения оболочки, установив `$PS1`).
+3. Настройте метод быстрой установки ваших dotfiles (и без ручного вмешательства) на новой машине. Это может быть так же просто, как shell-скрипт, вызывающий `ln -s` для каждого файла, или вы можете использовать [специальную утилиту](https://dotfiles.github.io/utilities/).
+4. Протестируйте ваш скрипт установки на свежей виртуальной машине.
+5. Перенесите все текущие конфигурации инструментов в репозиторий ваших dotfiles.
+6. Опубликуйте ваши dotfiles на GitHub.
 
-## Remote Machines
+## Удаленные машины
 
-Install a Linux virtual machine (or use an already existing one) for this exercise. If you are not familiar with virtual machines check out [this](https://hibbard.eu/install-ubuntu-virtual-box/) tutorial for installing one.
+Установите виртуальную машину Linux (или используйте уже существующую) для этого упражнения. Если вы не знакомы с виртуальными машинами, ознакомьтесь с [этим](https://hibbard.eu/install-ubuntu-virtual-box/) туториалом по установке.
 
-1. Go to `~/.ssh/` and check if you have a pair of SSH keys there. If not, generate them with `ssh-keygen -o -a 100 -t ed25519`. It is recommended that you use a password and use `ssh-agent` , more info [here](https://www.ssh.com/ssh/agent).
-1. Edit `.ssh/config` to have an entry as follows
+1. Перейдите в `~/.ssh/` и проверьте, есть ли у вас пара SSH-ключей. Если нет, сгенерируйте их с помощью `ssh-keygen -o -a 100 -t ed25519`. Рекомендуется использовать пароль и использовать `ssh-agent`, подробнее [здесь](https://www.ssh.com/ssh/agent).
+2. Отредактируйте `.ssh/config` чтобы в нем была следующая запись
 
 ```bash
 Host vm
@@ -502,8 +490,8 @@ Host vm
     IdentityFile ~/.ssh/id_ed25519
     LocalForward 9999 localhost:8888
 ```
-1. Use `ssh-copy-id vm` to copy your ssh key to the server.
-1. Start a webserver in your VM by executing `python -m http.server 8888`. Access the VM webserver by navigating to `http://localhost:9999` in your machine.
-1. Edit your SSH server config by doing  `sudo vim /etc/ssh/sshd_config` and disable password authentication by editing the value of `PasswordAuthentication`. Disable root login by editing the value of `PermitRootLogin`. Restart the `ssh` service with `sudo service sshd restart`. Try sshing in again.
-1. (Challenge) Install [`mosh`](https://mosh.org/) in the VM and establish a connection. Then disconnect the network adapter of the server/VM. Can mosh properly recover from it?
-1. (Challenge) Look into what the `-N` and `-f` flags do in `ssh` and figure out what a command to achieve background port forwarding.
+3. Используйте `ssh-copy-id vm`, чтобы скопировать ваш ssh ключ на сервер.
+4. Запустите веб-сервер в вашей виртуальной машине, выполнив `python -m http.server 8888`. Доступ к веб-серверу VM осуществляется путем перехода на `http://localhost:9999` с вашего компьютера.
+5. Отредактируйте конфигурацию вашего SSH-сервера, выполнив `sudo vim /etc/ssh/sshd_config` и отключите аутентификацию по паролю, изменив значение `PasswordAuthentication`. Отключите вход для root, изменив значение  `PermitRootLogin`. Перезапустите `ssh` сервис с помощью `sudo service sshd restart`. Попробуйте снова подключиться через ssh.
+6. (Задача) Установите [`mosh`](https://mosh.org/) в виртуальной машине и установите соединение. Затем отключите сетевой адаптер сервера/виртуальной машины. Сможет ли mosh правильно восстановиться после этого?
+7. (Задача)  Изучите, что делают флаги `-N` и `-f` в `ssh`, и выясните, какая команда нужна для фонового перенаправления портов.

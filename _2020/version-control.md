@@ -1,6 +1,6 @@
 ---
 layout: lecture
-title: "Version Control (Git)"
+title: "Контроль версий (Git)"
 date: 2020-01-22
 ready: true
 video:
@@ -8,61 +8,60 @@ video:
   id: 2sjqTHE0zok
 ---
 
-Version control systems (VCSs) are tools used to track changes to source code
-(or other collections of files and folders). As the name implies, these tools
-help maintain a history of changes; furthermore, they facilitate collaboration.
-VCSs track changes to a folder and its contents in a series of snapshots, where
-each snapshot encapsulates the entire state of files/folders within a top-level
-directory. VCSs also maintain metadata like who created each snapshot, messages
-associated with each snapshot, and so on.
+Системы контроля версий (VCS) - это инструменты, используемые для отслеживания изменений исходного кода
+(или других коллекций файлов и папок). Как следует из названия, эти инструменты
+помогают сохранять историю изменений; кроме того, они облегчают совместную работу.
+VCS отслеживают изменения в папке и ее содержимом в серии снимков, где
+каждый снимок охватывает всё состояние файлов/папок внутри верхнего уровня
+каталога. VCS также сохраняют метаданные, такие как кто создал каждый снимок, сообщения,
+ассоциированные с каждым снимком, и так далее.
 
-Why is version control useful? Even when you're working by yourself, it can let
-you look at old snapshots of a project, keep a log of why certain changes were
-made, work on parallel branches of development, and much more. When working
-with others, it's an invaluable tool for seeing what other people have changed,
-as well as resolving conflicts in concurrent development.
+Почему система контроля версий полезна? Даже когда вы работаете самостоятельно, она позволяет
+вам просматривать старые снимки проекта, вести лог причин внесения определенных изменений,
+работать на параллельных ветках разработки и многое другое. При работе
+с другими людьми это незаменимый инструмент для просмотра изменений, внесенных другими людьми,
+а также для разрешения конфликтов при параллельной разработке.
 
-Modern VCSs also let you easily (and often automatically) answer questions
-like:
+Современные системы контроля версий также позволяют легко (и часто автоматически) отвечать на вопросы вроде:
 
-- Who wrote this module?
-- When was this particular line of this particular file edited? By whom? Why
-  was it edited?
-- Over the last 1000 revisions, when/why did a particular unit test stop
-working?
+- Кто написал этот модуль?
+- Когда была отредактирована эта конкретная строка этого конкретного файла? Кем? Почему
+  она была отредактирована?
+- За последние 1000 ревизий, когда/почему перестал работать определенный модульный тест?
 
-While other VCSs exist, **Git** is the de facto standard for version control.
-This [XKCD comic](https://xkcd.com/1597/) captures Git's reputation:
+Хотя существуют и другие системы контроля версий, **Git** является фактическим стандартом для контроля версий.
+Этот [комикс XKCD](https://xkcd.com/1597/) отражает репутацию Git:
 
 ![xkcd 1597](https://imgs.xkcd.com/comics/git.png)
 
-Because Git's interface is a leaky abstraction, learning Git top-down (starting
-with its interface / command-line interface) can lead to a lot of confusion.
-It's possible to memorize a handful of commands and think of them as magic
-incantations, and follow the approach in the comic above whenever anything goes
-wrong.
+Поскольку интерфейс Git является "протекающей" абстракцией, изучение Git "сверху вниз" (начиная
+с его интерфейса / командной строки) может привести к большому количеству путаницы.
+Вполне возможно запомнить несколько команд и воспринимать их как магические
+заклинания, и следовать подходу в приведенном выше комиксе, когда что-то идет
+не так.
 
-While Git admittedly has an ugly interface, its underlying design and ideas are
-beautiful. While an ugly interface has to be _memorized_, a beautiful design
-can be _understood_. For this reason, we give a bottom-up explanation of Git,
-starting with its data model and later covering the command-line interface.
-Once the data model is understood, the commands can be better understood, in
-terms of how they manipulate the underlying data model.
+Хотя у Git, несомненно, некрасивый интерфейс, его базовый дизайн и идеи прекрасны. 
+В то время как некрасивый интерфейс должен быть _запомнен_, 
+прекрасный дизайн может быть _понят_. По этой причине мы даем 
+объяснение Git снизу вверх, начиная с его модели данных и позднее 
+охватывая интерфейс командной строки. Как только модель данных будет понята, 
+команды можно лучше понять, с точки зрения того, как они манипулируют базовой моделью данных.
 
-# Git's data model
+# модель данных Git
 
-There are many ad-hoc approaches you could take to version control. Git has a
-well thought-out model that enables all the nice features of version control,
-like maintaining history, supporting branches, and enabling collaboration.
+Есть много ad-hoc подходов, которые вы могли бы применить к контролю версий. Git имеет
+хорошо продуманную модель, которая позволяет использовать все преимущества контроля версий,
+такие как сохранение истории, поддержка ветвей и обеспечение совместной работы.
 
 ## Snapshots
 
-Git models the history of a collection of files and folders within some
-top-level directory as a series of snapshots. In Git terminology, a file is
-called a "blob", and it's just a bunch of bytes. A directory is called a
-"tree", and it maps names to blobs or trees (so directories can contain other
-directories). A snapshot is the top-level tree that is being tracked. For
-example, we might have a tree as follows:
+Git моделирует историю коллекции файлов и папок внутри некоторого 
+каталога верхнего уровня как серию снимков (snapshots).
+В терминологии Git, файл называется "blob", и это просто набор байтов.
+Каталог называется "деревом", и он отображает имена на blob'ы или деревья
+(так что каталоги могут содержать другие каталоги).
+Снимок - это дерево верхнего уровня, которое отслеживается.
+Например, у нас может быть следующее дерево:
 
 ```
 <root> (tree)
@@ -74,24 +73,22 @@ example, we might have a tree as follows:
 +- baz.txt (blob, contents = "git is wonderful")
 ```
 
-The top-level tree contains two elements, a tree "foo" (that itself contains
-one element, a blob "bar.txt"), and a blob "baz.txt".
+Дерево верхнего уровня содержит два элемента: дерево "foo" (которое само содержит 
+один элемент, blob "bar.txt") и blob "baz.txt".
 
-## Modeling history: relating snapshots
+## Модель истории: связанные снимки
 
-How should a version control system relate snapshots? One simple model would be
-to have a linear history. A history would be a list of snapshots in time-order.
-For many reasons, Git doesn't use a simple model like this.
+Как система контроля версий должна соотносить снимки? Простая модель могла бы
+иметь линейную историю. История была бы списком снимков в хронологическом порядке.
+По многим причинам, Git не использует такую модель.
 
-In Git, a history is a directed acyclic graph (DAG) of snapshots. That may
-sound like a fancy math word, but don't be intimidated. All this means is that
-each snapshot in Git refers to a set of "parents", the snapshots that preceded
-it. It's a set of parents rather than a single parent (as would be the case in
-a linear history) because a snapshot might descend from multiple parents, for
-example due to combining (merging) two parallel branches of development.
+В Git история представляет собой направленный ациклический граф (DAG) снимков. Это может
+звучать как сложный математический термин, но не стоит пугаться. Все, что это значит, это то,
+что каждый снимок в Git ссылается на набор "родителей", предшествующих снимков. Это набор родителей, а не один родитель (как было бы в
+случае линейной истории), потому что снимок может происходить от нескольких родителей, например, из-за объединения (merging) двух параллельных ветвей разработки.
 
-Git calls these snapshots "commit"s. Visualizing a commit history might look
-something like this:
+Git называет эти снимки "commit"s. Визуализация истории коммитов может выглядеть
+примерно так:
 
 ```
 o <-- o <-- o <-- o
@@ -100,14 +97,13 @@ o <-- o <-- o <-- o
               --- o <-- o
 ```
 
-In the ASCII art above, the `o`s correspond to individual commits (snapshots).
-The arrows point to the parent of each commit (it's a "comes before" relation,
-not "comes after"). After the third commit, the history branches into two
-separate branches. This might correspond to, for example, two separate features
-being developed in parallel, independently from each other. In the future,
-these branches may be merged to create a new snapshot that incorporates both of
-the features, producing a new history that looks like this, with the newly
-created merge commit shown in bold:
+На ASCII-арт выше, `o` соответствуют отдельным коммитам (снимкам). 
+Стрелки указывают на родителя каждого коммита (это отношение "предшествует", 
+а не "следует за"). После третьего коммита история разветвляется на две отдельные ветви. 
+Это может соответствовать, например, двум отдельным фичам, разрабатываемым параллельно, 
+независимо друг от друга. В будущем эти ветви могут быть объединены для создания нового снимка, 
+который включает обе фичи, создавая новую историю, которая выглядит примерно так, 
+с новым объединенным коммитом, показанным жирным шрифтом:
 
 <pre class="highlight">
 <code>
@@ -118,14 +114,14 @@ o <-- o <-- o <-- o <---- <strong>o</strong>
 </code>
 </pre>
 
-Commits in Git are immutable. This doesn't mean that mistakes can't be
-corrected, however; it's just that "edits" to the commit history are actually
-creating entirely new commits, and references (see below) are updated to point
-to the new ones.
+Коммиты в Git являются неизменяемыми. Это, однако, не означает, что ошибки не могут быть исправлены; 
+просто "редактирование" истории коммитов на самом 
+деле создает совершенно новые коммиты, и ссылки (см. ниже) 
+обновляются, чтобы указывать на новые.
 
-## Data model, as pseudocode
+## Модель данных, псевдокод
 
-It may be instructive to see Git's data model written down in pseudocode:
+Может быть полезно увидеть модель данных Git, записанную в псевдокоде:
 
 ```
 // a file is a bunch of bytes
@@ -143,18 +139,17 @@ type commit = struct {
 }
 ```
 
-It's a clean, simple model of history.
+Это простая модель истории.
 
-## Objects and content-addressing
+## Объекты и адресация по содержимому (Objects and content-addressing)
 
-An "object" is a blob, tree, or commit:
+"Объект" - это blob, дерево, или коммит:
 
 ```
 type object = blob | tree | commit
 ```
 
-In Git data store, all objects are content-addressed by their [SHA-1
-hash](https://en.wikipedia.org/wiki/SHA-1).
+В хранилище данных Git все объекты адресуются по их [хешу SHA-1](https://ru.wikipedia.org/wiki/SHA-1).
 
 ```
 objects = map<string, object>
@@ -167,38 +162,38 @@ def load(id):
     return objects[id]
 ```
 
-Blobs, trees, and commits are unified in this way: they are all objects. When
-they reference other objects, they don't actually _contain_ them in their
-on-disk representation, but have a reference to them by their hash.
+Blob'ы, деревья и коммиты объединены следующим образом: они все являются объектами. 
+Когда они ссылаются на другие объекты, они на самом деле не _содержат_ их 
+в своем представлении на диске, но имеют ссылку на них по их хешу.
 
-For example, the tree for the example directory structure [above](#snapshots)
-(visualized using `git cat-file -p 698281bc680d1995c5f4caaf3359721a5a58d48d`),
-looks like this:
+Например, дерево из примера [сверху](#snapshots)
+(визуализация с помощью `git cat-file -p 698281bc680d1995c5f4caaf3359721a5a58d48d`),
+выглядит следующим образом:
 
 ```
 100644 blob 4448adbf7ecd394f42ae135bbeed9676e894af85    baz.txt
 040000 tree c68d233a33c5c06e0340e4c224f0afca87c8ce87    foo
 ```
 
-The tree itself contains pointers to its contents, `baz.txt` (a blob) and `foo`
-(a tree). If we look at the contents addressed by the hash corresponding to
-baz.txt with `git cat-file -p 4448adbf7ecd394f42ae135bbeed9676e894af85`, we get
-the following:
+Дерево содержит указатели до его содержимого, `baz.txt` (blob) и `foo`
+(дерево). Если мы посмотрим на содержание по адресу хэша, соответствующего файлу
+`baz.txt` с помощью `git cat-file -p 4448adbf7ecd394f42ae135bbeed9676e894af85`, 
+мы получим:
 
 ```
 git is wonderful
 ```
 
-## References
+## Ссылки
 
-Now, all snapshots can be identified by their SHA-1 hash. That's inconvenient,
-because humans aren't good at remembering strings of 40 hexadecimal characters.
+Все снимки можно идентифицировать по их хешу SHA-1. Это неудобно,
+потому что людям сложно запоминать строки из 40 шестнадцатеричных символов.
 
-Git's solution to this problem is human-readable names for SHA-1 hashes, called
-"references". References are pointers to commits. Unlike objects, which are
-immutable, references are mutable (can be updated to point to a new commit).
-For example, the `master` reference usually points to the latest commit in the
-main branch of development.
+Решение Git для этой проблемы - это понятные человеку имена для хешей SHA-1, называемые
+"ссылками". Ссылки - это указатели на коммиты. В отличие от объектов, которые являются
+неизменяемыми, ссылки являются изменяемыми (могут быть обновлены для указания на новый коммит).
+Например, ссылка `master` обычно указывает на последний коммит в
+основной ветке.
 
 ```
 references = map<string, string>
@@ -216,349 +211,153 @@ def load_reference(name_or_id):
         return load(name_or_id)
 ```
 
-With this, Git can use human-readable names like "master" to refer to a
-particular snapshot in the history, instead of a long hexadecimal string.
+С их помощью Git может использовать понятные людям имена, 
+такие как "master", чтобы ссылаться на определенный снимок в истории, вместо длинной шестнадцатеричной строки.
 
-One detail is that we often want a notion of "where we currently are" in the
-history, so that when we take a new snapshot, we know what it is relative to
-(how we set the `parents` field of the commit). In Git, that "where we
-currently are" is a special reference called "HEAD".
+Важная деталь заключается в том, что нам часто нужно понятие 
+"где мы сейчас находимся" в истории, чтобы когда мы делаем новый снимок, 
+мы знали, относительно чего он сделан 
+(как мы устанавливаем поле `parents` коммита). В Git это "где мы сейчас находимся" - это специальная ссылка под названием "HEAD".
 
-## Repositories
+## Репозитории
 
-Finally, we can define what (roughly) is a Git _repository_: it is the data
-`objects` and `references`.
+Наконец, мы можем определить, что (примерно) такое Git _репозиторий_: это данные
+`объекты` и `ссылки`.
 
-On disk, all Git stores are objects and references: that's all there is to Git's
-data model. All `git` commands map to some manipulation of the commit DAG by
-adding objects and adding/updating references.
+На диске все, что хранит Git, это объекты и ссылки: это все, что есть в
+модели данных Git. Все команды `git` соответствуют некоторой манипуляции с DAG коммитов путем
+добавления объектов и добавления/обновления ссылок.
 
-Whenever you're typing in any command, think about what manipulation the
-command is making to the underlying graph data structure. Conversely, if you're
-trying to make a particular kind of change to the commit DAG, e.g. "discard
-uncommitted changes and make the 'master' ref point to commit `5d83f9e`", there's
-probably a command to do it (e.g. in this case, `git checkout master; git reset
---hard 5d83f9e`).
+Каждый раз, когда вы вводите команду, подумайте о том, какие манипуляции она
+делает со структурой данных графа. Если вы пытаетесь сделать определенный вид изменения в DAG коммитов, например, "отменить неподтвержденные изменения и сделать ссылку 'master' указывающей на коммит `5d83f9e`", вероятно, есть команда для этого (например, в этом случае, `git checkout master; git reset --hard 5d83f9e`).
 
-# Staging area
+# Промежуточная область
 
-This is another concept that's orthogonal to the data model, but it's a part of
-the interface to create commits.
+Это еще одно понятие, которое ортогонально модели данных, но является частью
+интерфейса для создания коммитов.
 
-One way you might imagine implementing snapshotting as described above is to have
-a "create snapshot" command that creates a new snapshot based on the _current
-state_ of the working directory. Some version control tools work like this, but
-not Git. We want clean snapshots, and it might not always be ideal to make a
-snapshot from the current state. For example, imagine a scenario where you've
-implemented two separate features, and you want to create two separate commits,
-where the first introduces the first feature, and the next introduces the
-second feature. Or imagine a scenario where you have debugging print statements
-added all over your code, along with a bugfix; you want to commit the bugfix
-while discarding all the print statements.
+Один из способов, которым вы могли бы представить реализацию создания снимков - это иметь
+команду "создать снимок", которая создает новый снимок на основе _текущего
+состояния_ рабочего каталога. Некоторые инструменты контроля версий работают так, но
+не Git. Мы хотим чистые снимки, и не всегда идеально делать снимок из текущего состояния. Например, представьте себе сценарий, когда вы
+реализовали две отдельные функции, и вы хотите создать два отдельных коммита,
+где первый вводит первую функцию, а следующий вводит
+вторую. Или представьте сценарий, когда у вас есть отладочные операторы print,
+добавленные по всему вашему коду, вместе с исправлением ошибки; вы хотите закомитить исправление ошибки,
+а не операторы print.
 
-Git accommodates such scenarios by allowing you to specify which modifications
-should be included in the next snapshot through a mechanism called the "staging
-area".
+Git учитывает такие сценарии, позволяя вам указывать, какие изменения
+должны быть включены в следующий снимок через механизм, называемый "промежуточной
+областью" (staging area).
 
-# Git command-line interface
+# Интерфейс командной строки Git
 
-To avoid duplicating information, we're not going to explain the commands below
-in detail. See the highly recommended [Pro Git](https://git-scm.com/book/en/v2)
-for more information, or watch the lecture video.
+Чтобы избежать дублирования информации, мы не собираемся подробно объяснять команды. 
+Для получения дополнительной информации рекомендуется 
+ознакомиться с [Pro Git](https://git-scm.com/book/en/v2) или посмотреть видео лекции.
 
 ## Basics
 
-{% comment %}
+- `git help <command>`: получить подсказку по команде git
+- `git init`: создает новый репозиторий git; данные будут храняться в директории `.git`
+- `git status`: сообщает, что происходит
+- `git add <filename>`: добавляет файлы в промежуточную область
+- `git commit`: создает новый коммит
+    - Пишите [хорошие сообщения коммитов](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)!
+    - Еще больше причин писать [хорошие сообщения коммитов](https://chris.beams.io/posts/git-commit/)!
+- `git log`: показывает историю изменений
+- `git log --all --graph --decorate`: визуализирует историю в виде DAG
+- `git diff <filename>`: показывает изменения, которые вы сделали относительно промежуточной области
+- `git diff <revision> <filename>`: показывает различия в файле между снимками
+- `git checkout <revision>`: обновляет HEAD и текущую ветку
 
-The `git init` command initializes a new Git repository, with repository
-metadata being stored in the `.git` directory:
 
-```console
-$ mkdir myproject
-$ cd myproject
-$ git init
-Initialized empty Git repository in /home/missing-semester/myproject/.git/
-$ git status
-On branch master
+## Ветвление и слияние (Branching and merging)
 
-No commits yet
+- `git branch`: показывает ветки
+- `git branch <name>`: создает ветку
+- `git checkout -b <name>`: создает ветку и переключается на нее
+    - то же самое, что `git branch <name>; git checkout <name>`
+- `git merge <revision>`: выполняет слияние в текущую ветку
+- `git mergetool`: использует специальный инструмент для помощи в разрешении конфликтов при слиянии
+- `git rebase`: последовательно применяет набор коммитов поверх определенного коммита
 
-nothing to commit (create/copy files and use "git add" to track)
-```
+## Удаленные репозитории
 
-How do we interpret this output? "No commits yet" basically means our version
-history is empty. Let's fix that.
+- `git remote`: список удаленных репозиториев
+- `git remote add <name> <url>`: добавить удаленный репозиторий
+- `git push <remote> <local branch>:<remote branch>`: отправить объекты в удаленный репозиторий и обновить удаленную ссылку
+- `git branch --set-upstream-to=<remote>/<remote branch>`: установить соответствие между локальной и удаленной веткой
+- `git fetch`: получить объекты/ссылки из удаленного репозитория
+- `git pull`: то же самое, что `git fetch; git merge`
+- `git clone`: скачать репозиторий с удаленного сервера
 
-```console
-$ echo "hello, git" > hello.txt
-$ git add hello.txt
-$ git status
-On branch master
+## Отмена
 
-No commits yet
+- `git commit --amend`: редактирование содержимого/сообщения коммита
+- `git reset HEAD <file>`: отмена добавления файла
+- `git checkout -- <file>`: отклонение изменений
 
-Changes to be committed:
-  (use "git rm --cached <file>..." to unstage)
+# Продвинутый Git
 
-        new file:   hello.txt
+- `git config`: Git [высоконастраиваем](https://git-scm.com/docs/git-config)
+- `git clone --depth=1`: поверхностное клонирование, без полной истории версий
+- `git add -p`: интерактивное добавление
+- `git rebase -i`: интерактивное перебазирование
+- `git blame`: показать, кто последний редактировал каждую строку
+- `git stash`: временное удаление изменений рабочего каталога
+- `git bisect`: бинарный поиск по истории (например, для регрессий)
+- `.gitignore`: [указать](https://git-scm.com/docs/gitignore) намеренно неотслеживаемые файлы для игнорирования
 
-$ git commit -m 'Initial commit'
-[master (root-commit) 4515d17] Initial commit
- 1 file changed, 1 insertion(+)
- create mode 100644 hello.txt
-```
+# Разное
 
-With this, we've `git add`ed a file to the staging area, and then `git
-commit`ed that change, adding a simple commit message "Initial commit". If we
-didn't specify a `-m` option, Git would open our text editor to allow us type a
-commit message.
+- **Графические интерфейсы**: существует множество [графических клиентов](https://git-scm.com/downloads/guis) для Git. Мы лично их не используем и вместо этого используем интерфейс командной строки.
+- **Интеграция с оболочкой**: очень удобно видеть статус Git внутри вашей оболочки ([zsh](https://github.com/olivierverdier/zsh-git-prompt), [bash](https://github.com/magicmonty/bash-git-prompt)). Часто включено в фреймворки, такие как [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh).
+- **Интеграция с редактором**: аналогично вышеуказанному, удобные интеграции со многими функциями. [fugitive.vim](https://github.com/tpope/vim-fugitive) является стандартным для Vim.
+- **Рабочие процессы**: мы научили вас модели данных, плюс некоторые базовые команды; мы не говорили вам, какие практики следует соблюдать при работе над большими проектами (существует [много](https://nvie.com/posts/a-successful-git-branching-model/) [различных](https://www.endoflineblog.com/gitflow-considered-harmful) [подходов](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)).
+- **GitHub**: Git не является GitHub. У GitHub есть специфический способ внесения кода в другие проекты, называемый [pull requests](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests).
+- **Другие провайдеры Git**: GitHub не единственный: существует множество хостов репозиториев Git, таких как [GitLab](https://about.gitlab.com/) и [BitBucket](https://bitbucket.org/). 
 
-Now that we have a non-empty version history, we can visualize the history.
-Visualizing the history as a DAG can be especially helpful in understanding the
-current status of the repo and connecting it with your understanding of the Git
-data model.
+# Ресурсы
 
-The `git log` command visualizes history. By default, it shows a flattened
-version, which hides the graph structure. If you use a command like `git log
---all --graph --decorate`, it will show you the full version history of the
-repository, visualized in graph form.
+- [Pro Git](https://git-scm.com/book/en/v2) - **настоятельно рекомендуется к прочтению**.
+Изучение глав 1-5 научит вас большей части того, что вам нужно знать для эффективного использования Git,
+теперь, когда вы понимаете модель данных. Последующие главы содержат
+интересный и продвинутый материал.
+- [Oh Shit, Git!?!](https://ohshitgit.com/) - короткое руководство о том, как исправлять распространенные ошибки в Git.
+- [Git for Computer Scientists](https://eagain.net/articles/git-for-computer-scientists/) - это
+короткое объяснение модели данных Git, с меньшим количеством псевдокода и большим количеством сложных
+диаграмм.
+- [Git from the Bottom Up](https://jwiegley.github.io/git-from-the-bottom-up/) - подробное объяснение деталей реализации Git; для любопытных.
+- [How to explain git in simple words](https://smusamashah.github.io/blog/2017/10/14/explain-git-in-simple-words)
+- [Изучите Git Branching](https://learngitbranching.js.org/) - это браузерная
+игра, которая учит вас Git.
 
-```console
-$ git log --all --graph --decorate
-* commit 4515d17a167bdef0a91ee7d50d75b12c9c2652aa (HEAD -> master)
-  Author: Missing Semester <missing-semester@mit.edu>
-  Date:   Tue Jan 21 22:18:36 2020 -0500
+# Упражнения
 
-      Initial commit
-```
-
-This doesn't look all that graph-like, because it only contains a single node.
-Let's make some more changes, author a new commit, and visualize the history
-once more.
-
-```console
-$ echo "another line" >> hello.txt
-$ git status
-On branch master
-Changes not staged for commit:
-  (use "git add <file>..." to update what will be committed)
-  (use "git checkout -- <file>..." to discard changes in working directory)
-
-        modified:   hello.txt
-
-no changes added to commit (use "git add" and/or "git commit -a")
-$ git add hello.txt
-$ git status
-On branch master
-Changes to be committed:
-  (use "git reset HEAD <file>..." to unstage)
-
-        modified:   hello.txt
-
-$ git commit -m 'Add a line'
-[master 35f60a8] Add a line
- 1 file changed, 1 insertion(+)
-```
-
-Now, if we visualize the history again, we'll see some of the graph structure:
-
-```
-* commit 35f60a825be0106036dd2fbc7657598eb7b04c67 (HEAD -> master)
-| Author: Missing Semester <missing-semester@mit.edu>
-| Date:   Tue Jan 21 22:26:20 2020 -0500
-|
-|     Add a line
-|
-* commit 4515d17a167bdef0a91ee7d50d75b12c9c2652aa
-  Author: Anish Athalye <me@anishathalye.com>
-  Date:   Tue Jan 21 22:18:36 2020 -0500
-
-      Initial commit
-```
-
-Also, note that it shows the current HEAD, along with the current branch
-(master).
-
-We can look at old versions using the `git checkout` command.
-
-```console
-$ git checkout 4515d17  # previous commit hash; yours will be different
-Note: checking out '4515d17'.
-
-You are in 'detached HEAD' state. You can look around, make experimental
-changes and commit them, and you can discard any commits you make in this
-state without impacting any branches by performing another checkout.
-
-If you want to create a new branch to retain commits you create, you may
-do so (now or later) by using -b with the checkout command again. Example:
-
-  git checkout -b <new-branch-name>
-
-HEAD is now at 4515d17 Initial commit
-$ cat hello.txt
-hello, git
-$ git checkout master
-Previous HEAD position was 4515d17 Initial commit
-Switched to branch 'master'
-$ cat hello.txt
-hello, git
-another line
-```
-
-Git can show you how files have evolved (differences, or diffs) using the `git
-diff` command:
-
-```console
-$ git diff 4515d17 hello.txt
-diff --git c/hello.txt w/hello.txt
-index 94bab17..f0013b2 100644
---- c/hello.txt
-+++ w/hello.txt
-@@ -1 +1,2 @@
- hello, git
- +another line
-```
-
-{% endcomment %}
-
-- `git help <command>`: get help for a git command
-- `git init`: creates a new git repo, with data stored in the `.git` directory
-- `git status`: tells you what's going on
-- `git add <filename>`: adds files to staging area
-- `git commit`: creates a new commit
-    - Write [good commit messages](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)!
-    - Even more reasons to write [good commit messages](https://chris.beams.io/posts/git-commit/)!
-- `git log`: shows a flattened log of history
-- `git log --all --graph --decorate`: visualizes history as a DAG
-- `git diff <filename>`: show changes you made relative to the staging area
-- `git diff <revision> <filename>`: shows differences in a file between snapshots
-- `git checkout <revision>`: updates HEAD and current branch
-
-## Branching and merging
-
-{% comment %}
-
-Branching allows you to "fork" version history. It can be helpful for working
-on independent features or bug fixes in parallel. The `git branch` command can
-be used to create new branches; `git checkout -b <branch name>` creates and
-branch and checks it out.
-
-Merging is the opposite of branching: it allows you to combine forked version
-histories, e.g. merging a feature branch back into master. The `git merge`
-command is used for merging.
-
-{% endcomment %}
-
-- `git branch`: shows branches
-- `git branch <name>`: creates a branch
-- `git checkout -b <name>`: creates a branch and switches to it
-    - same as `git branch <name>; git checkout <name>`
-- `git merge <revision>`: merges into current branch
-- `git mergetool`: use a fancy tool to help resolve merge conflicts
-- `git rebase`: rebase set of patches onto a new base
-
-## Remotes
-
-- `git remote`: list remotes
-- `git remote add <name> <url>`: add a remote
-- `git push <remote> <local branch>:<remote branch>`: send objects to remote, and update remote reference
-- `git branch --set-upstream-to=<remote>/<remote branch>`: set up correspondence between local and remote branch
-- `git fetch`: retrieve objects/references from a remote
-- `git pull`: same as `git fetch; git merge`
-- `git clone`: download repository from remote
-
-## Undo
-
-- `git commit --amend`: edit a commit's contents/message
-- `git reset HEAD <file>`: unstage a file
-- `git checkout -- <file>`: discard changes
-
-# Advanced Git
-
-- `git config`: Git is [highly customizable](https://git-scm.com/docs/git-config)
-- `git clone --depth=1`: shallow clone, without entire version history
-- `git add -p`: interactive staging
-- `git rebase -i`: interactive rebasing
-- `git blame`: show who last edited which line
-- `git stash`: temporarily remove modifications to working directory
-- `git bisect`: binary search history (e.g. for regressions)
-- `.gitignore`: [specify](https://git-scm.com/docs/gitignore) intentionally untracked files to ignore
-
-# Miscellaneous
-
-- **GUIs**: there are many [GUI clients](https://git-scm.com/downloads/guis)
-out there for Git. We personally don't use them and use the command-line
-interface instead.
-- **Shell integration**: it's super handy to have a Git status as part of your
-shell prompt ([zsh](https://github.com/olivierverdier/zsh-git-prompt),
-[bash](https://github.com/magicmonty/bash-git-prompt)). Often included in
-frameworks like [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh).
-- **Editor integration**: similarly to the above, handy integrations with many
-features. [fugitive.vim](https://github.com/tpope/vim-fugitive) is the standard
-one for Vim.
-- **Workflows**: we taught you the data model, plus some basic commands; we
-didn't tell you what practices to follow when working on big projects (and
-there are [many](https://nvie.com/posts/a-successful-git-branching-model/)
-[different](https://www.endoflineblog.com/gitflow-considered-harmful)
-[approaches](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)).
-- **GitHub**: Git is not GitHub. GitHub has a specific way of contributing code
-to other projects, called [pull
-requests](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests).
-- **Other Git providers**: GitHub is not special: there are many Git repository
-hosts, like [GitLab](https://about.gitlab.com/) and
-[BitBucket](https://bitbucket.org/).
-
-# Resources
-
-- [Pro Git](https://git-scm.com/book/en/v2) is **highly recommended reading**.
-Going through Chapters 1--5 should teach you most of what you need to use Git
-proficiently, now that you understand the data model. The later chapters have
-some interesting, advanced material.
-- [Oh Shit, Git!?!](https://ohshitgit.com/) is a short guide on how to recover
-from some common Git mistakes.
-- [Git for Computer
-Scientists](https://eagain.net/articles/git-for-computer-scientists/) is a
-short explanation of Git's data model, with less pseudocode and more fancy
-diagrams than these lecture notes.
-- [Git from the Bottom Up](https://jwiegley.github.io/git-from-the-bottom-up/)
-is a detailed explanation of Git's implementation details beyond just the data
-model, for the curious.
-- [How to explain git in simple
-words](https://smusamashah.github.io/blog/2017/10/14/explain-git-in-simple-words)
-- [Learn Git Branching](https://learngitbranching.js.org/) is a browser-based
-game that teaches you Git.
-
-# Exercises
-
-1. If you don't have any past experience with Git, either try reading the first
-   couple chapters of [Pro Git](https://git-scm.com/book/en/v2) or go through a
-   tutorial like [Learn Git Branching](https://learngitbranching.js.org/). As
-   you're working through it, relate Git commands to the data model.
-1. Clone the [repository for the
-class website](https://github.com/missing-semester/missing-semester).
-    1. Explore the version history by visualizing it as a graph.
-    1. Who was the last person to modify `README.md`? (Hint: use `git log` with
-       an argument)
-    1. What was the commit message associated with the last modification to the
-       `collections:` line of `_config.yml`? (Hint: use `git blame` and `git
-       show`)
-1. One common mistake when learning Git is to commit large files that should
-   not be managed by Git or adding sensitive information. Try adding a file to
-   a repository, making some commits and then deleting that file from history
-   (you may want to look at
-   [this](https://help.github.com/articles/removing-sensitive-data-from-a-repository/)).
-1. Clone some repository from GitHub, and modify one of its existing files.
-   What happens when you do `git stash`? What do you see when running `git log
-   --all --oneline`? Run `git stash pop` to undo what you did with `git stash`.
-   In what scenario might this be useful?
-1. Like many command line tools, Git provides a configuration file (or dotfile)
-   called `~/.gitconfig`. Create an alias in `~/.gitconfig` so that when you
-   run `git graph`, you get the output of `git log --all --graph --decorate
-   --oneline`.
-1. You can define global ignore patterns in `~/.gitignore_global` after running
-   `git config --global core.excludesfile ~/.gitignore_global`. Do this, and
-   set up your global gitignore file to ignore OS-specific or editor-specific
-   temporary files, like `.DS_Store`.
-1. Fork the [repository for the class
-   website](https://github.com/missing-semester/missing-semester), find a typo
-   or some other improvement you can make, and submit a pull request on GitHub.
+1. Если у вас нет предыдущего опыта работы с Git, попробуйте прочитать первые
+   несколько глав [Pro Git](https://git-scm.com/book/en/v2) или пройдите
+   туториал, например, [Learn Git Branching](https://learngitbranching.js.org/).
+2. Склонируйте [репозиторий веб-сайта класса](https://github.com/missing-semester/missing-semester).
+    1. Исследуйте историю версий, визуализируя ее в виде графа.
+    2. Кто последним изменил `README.md`? (Подсказка: используйте `git log`)
+    3. Какое сообщение коммита было связано с последней модификацией
+       строки `collections:` в `_config.yml`? (Подсказка: используйте `git blame` и `git show`)
+3. Одна из распространенных ошибок при изучении Git - это коммит больших файлов, которые не должны
+   управляться через Git; или добавление конфиденциальной информации. Попробуйте добавить файл в
+   репозиторий, сделать несколько коммитов, а затем удалить этот файл из истории
+   (возможно, вы захотите посмотреть
+   [это](https://help.github.com/articles/removing-sensitive-data-from-a-repository/)).
+4. Склонируйте какой-нибудь репозиторий с GitHub и измените один из его существующих файлов.
+   Что происходит, когда вы делаете `git stash`? Что вы видите при выполнении `git log --all --oneline`? 
+   Выполните `git stash pop`, чтобы отменить то, что вы сделали с `git stash`.
+   В каком сценарии это может быть полезно?
+5. Как и многие инструменты командной строки, Git предоставляет файл конфигурации (или dotfile)
+   под названием `~/.gitconfig`. Создайте псевдоним в `~/.gitconfig`, чтобы при выполнении
+   `git graph` вы получали вывод `git log --all --graph --decorate --oneline`.
+6. Вы можете определить глобальные шаблоны игнорирования в `~/.gitignore_global` после выполнения
+   `git config --global core.excludesfile ~/.gitignore_global`. Сделайте это и
+   настройте ваш глобальный файл gitignore так, чтобы он игнорировал временные файлы, специфичные для ОС или редактора,
+   например, `.DS_Store`.
+7. Создайте форк [репозитория веб-сайта класса](https://github.com/missing-semester/missing-semester), найдите опечатку
+   или какое-то другое улучшение, которое вы можете сделать, и отправьте пулл-реквест на GitHub.
