@@ -5,22 +5,22 @@
 Перевод на русский: [Пропущенный семестр курса по компьютерным наукам](https://missing-semester-rus.github.io/).
 
 Перевод не авторизован. Вы можете принять участие в переводе лекций. 
-Контрибьюторы: [@chmsv](https://github.com/chmsv), [@LaRRu](https://github.com/LaRRu), [@kershik](https://github.com/kershik), [@amordo](https://github.com/amordo), [@Podidiving](https://github.com/Podidiving)
+Контрибьюторы: [@chmsv](https://github.com/chmsv), [@LaRRu](https://github.com/LaRRu), [@Vladislav-GitHub](https://github.com/Vladislav-GitHub), [@ulysses4ever](https://github.com/ulysses4ever), [@kershik](https://github.com/kershik), [@amordo](https://github.com/amordo), [@Podidiving](https://github.com/Podidiving)
 
 ## Переведенные лекции 
 
-- Обзор курса + знакомство с оболочкой
-- Скрипты
-- Текстовые редакторы (Vim)
-- Data Wrangling
-- Среда командой строки
-- Контроль версий (Git)
-- Отладка и Профилирование
-- Метапрограммирование
-- Безопасность и Криптография
-- Potpourri
+- [Обзор курса + знакомство с оболочкой](https://missing-semester-rus.github.io/2020/course-shell/)
+- [Оболочка и Скрипты](https://missing-semester-rus.github.io/2020/shell-tools/)
+- [Текстовые редакторы (Vim)](https://missing-semester-rus.github.io/2020/editors/)
+- [Управление данными](https://missing-semester-rus.github.io/2020/data-wrangling/)
+- [Среда командой строки](https://missing-semester-rus.github.io/2020/command-line/)
+- [Контроль версий (Git)](https://missing-semester-rus.github.io/2020/version-control/)
+- [Отладка и Профилирование](https://missing-semester-rus.github.io/2020/debugging-profiling/)
+- [Метапрограммирование](https://missing-semester-rus.github.io/2020/metaprogramming/)
+- [Безопасность и Криптография](https://missing-semester-rus.github.io/2020/security/)
+- [Попурри из ответов на разные вопросы за пределами основного курса](https://missing-semester-rus.github.io/2020/potpourri/)
 
-## Разработка
+## Развертывание сайта локально
 
 Чтобы собрать и запустить сайт локально, используйте команду:
 
