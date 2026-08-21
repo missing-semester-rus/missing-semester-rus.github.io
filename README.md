@@ -5,7 +5,7 @@
 Перевод на русский: [Пропущенный семестр курса по компьютерным наукам](https://missing-semester-rus.github.io/).
 
 Перевод не авторизован. Вы можете принять участие в переводе лекций. 
-Контрибьюторы: [@chmsv](https://github.com/chmsv), [@LaRRu](https://github.com/LaRRu), [@Vladislav-GitHub](https://github.com/Vladislav-GitHub), [@ulysses4ever](https://github.com/ulysses4ever), [@kershik](https://github.com/kershik), [@amordo](https://github.com/amordo), [@Podidiving](https://github.com/Podidiving)
+Контрибьюторы 2020-2022: [@chmsv](https://github.com/chmsv), [@LaRRu](https://github.com/LaRRu), [@Vladislav-GitHub](https://github.com/Vladislav-GitHub), [@ulysses4ever](https://github.com/ulysses4ever), [@kershik](https://github.com/kershik), [@amordo](https://github.com/amordo), [@Podidiving](https://github.com/Podidiving). Перевод всех лекций 2026 года подготовлен [@vasilevklart](https://github.com/vasilevklart).
 
 ## Переведенные лекции 
 
