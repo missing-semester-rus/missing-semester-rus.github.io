@@ -26,6 +26,7 @@ collections:
 # Excludes
 exclude:
   - README.md
+  - TRANSLATION_GUIDE.md
   - Gemfile
   - Gemfile.lock
   - vendor
